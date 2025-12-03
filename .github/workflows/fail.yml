@@ -1,0 +1,25 @@
+name: Always Fail Review
+
+# Configure the action to run on every push (commit) to any branch
+on: [push]
+
+jobs:
+  # Define a single job named 'failing_test'
+  failing_test:
+    # Specify the runner environment for the job
+    runs-on: ubuntu-latest
+
+    # Define the steps that the job will execute
+    steps:
+      - name: Checkout Repository
+        # Use the standard action to get the code
+        uses: actions/checkout@v4
+
+      - name: Guarantee Failure
+        # This step uses a shell command that is guaranteed to fail.
+        # The 'exit 1' command exits the script with a status code of 1,
+        # which GitHub Actions interprets as a failure.
+        run: |
+          echo "This action is designed to fail!"
+          echo "Simulating a failing test or review process..."
+          exit 1
