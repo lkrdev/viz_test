@@ -11,6 +11,11 @@ const queries: Query[] = [
     height: 300,
     width: 400,
   },
+  {
+    query_id: "ABC",
+    height: 300,
+    width: 400,
+  },
 ];
 
 export default queries;
