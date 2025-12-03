@@ -9,6 +9,7 @@ const QueryRender: React.FC<{
 }> = ({ api_url, height = 500, width = 500 }) => {
   const [done, setDone] = React.useState(false);
   return (
+    // hello
     <Box>
       {done && <Box id="query-done" />}
       <img
