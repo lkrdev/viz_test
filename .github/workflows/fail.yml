@@ -8,6 +8,8 @@ jobs:
   failing_test:
     # Specify the runner environment for the job
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     # Define the steps that the job will execute
     steps:
