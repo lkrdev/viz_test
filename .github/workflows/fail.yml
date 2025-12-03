@@ -23,3 +23,21 @@ jobs:
           echo "This action is designed to fail!"
           echo "Simulating a failing test or review process..."
           exit 1
+
+      - name: Jules You Failed
+        # This 'if' condition ensures this step ONLY runs if the job failed
+        # (in this case, due to the previous 'mandatory_fail' step).
+        if: failure()
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          # The PR number is automatically available in the event context
+          issue-number: ${{ github.event.pull_request.number }}
+          # The body of the comment to post on the PR
+          body: |
+            ## ❌ PR Review Failure Notice
+
+            This automatic test/review process is configured to fail on every run. 
+
+            **Reason:** The step 'Guarantee Failure' explicitly returned a non-zero exit code (exit 1).
+
+            @jules You Failed
