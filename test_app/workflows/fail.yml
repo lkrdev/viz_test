@@ -36,10 +36,4 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           # The body of the comment to post on the PR
           body: |
-            ## ❌ PR Review Failure Notice
-
-            This automatic test/review process is configured to fail on every run. 
-
-            **Reason:** The step 'Guarantee Failure' explicitly returned a non-zero exit code (exit 1).
-
             @jules You Failed
