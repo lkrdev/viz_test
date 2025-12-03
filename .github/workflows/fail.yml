@@ -1,7 +1,7 @@
 name: Always Fail Review
 
 # Configure the action to run on every push (commit) to any branch
-on: [push]
+on: [pull_request]
 
 jobs:
   # Define a single job named 'failing_test'
