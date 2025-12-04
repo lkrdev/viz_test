@@ -2,7 +2,16 @@
   "name": "hierarchical-combo-filter-with-search-test-app",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
-    "test:all": "jest"
+    "test:check": "./scripts/check-for-package-tests.sh",
+    "test:query-visualization": "./scripts/run-tests/query-visualization.sh",
+    "init:all": "./scripts/init.sh",
+    "clean:all": "./scripts/clean.sh",
+    "all-npm-packages": "./scripts/all-npm-packages.sh",
+    "new:package": "./scripts/new-visualization/create-template.sh $1",
+    "new:package-test": "./scripts/new-visualization/create-test-template.sh $1",
+    "new": "./scripts/new-visualization/new-package.sh $1",
+    "check-env": "./scripts/check-env.sh"
   }
 }
