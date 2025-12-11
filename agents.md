@@ -14,6 +14,13 @@
 
 - do not use `yarn test:query-visualization --all` or `yarn test:query-render --all` (these run the whole repo). When testing a specific visualization use `yarn test:query-visualization -P <package_name>` or `yarn test:query-render -P <package_name>`.
 
+# Integration Testing
+
+- Ensure the agent uses prefixed `LOOKERSDK` environment variables to run integration tests.
+- Initial Step: Print out just the names of the environment variables the agent has access to.
+- If there are no prefixed `LOOKERSDK` variables, instruct the user to add them to the Codebases section and recreate a new session.
+- Ensure the user provides a query slug for the integration tests upfront. Ask for this immediately if not provided.
+
 # Building a new visualization
 
 - Start with `create-test-template.sh` and `create-visualization-template.sh` to create the test template.
