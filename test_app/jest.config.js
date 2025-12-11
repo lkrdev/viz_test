@@ -32,6 +32,6 @@ module.exports = {
     }],
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(d3-color|@looker)/)",
+    "node_modules/(?!((d3-[a-zA-Z0-9-]+)|internmap|@looker)/)",
   ],
 };
