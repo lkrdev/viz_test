@@ -23,9 +23,14 @@ interface DrillableCellProps {
    * - 'raw': Displays only the 'value' property. Drill links are disabled.
    */
   displayMode?: 'rendered' | 'raw';
+  /**
+   * Optional click handler override. If provided, this will be called instead of opening the drill menu.
+   * Useful for cross-filtering interactions.
+   */
+  onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
 }
 
-export const DrillableCell: React.FC<DrillableCellProps> = ({ cell, className, style, displayMode = 'rendered' }) => {
+export const DrillableCell: React.FC<DrillableCellProps> = ({ cell, className, style, displayMode = 'rendered', onClick }) => {
   // Safety check: ensure cell exists
   if (!cell) return null;
 
@@ -41,21 +46,29 @@ export const DrillableCell: React.FC<DrillableCellProps> = ({ cell, className, s
   } else { // displayMode === 'rendered' (default behavior)
     displayValue = cell.rendered !== undefined ? cell.rendered : rawValue;
     const hasLinks = Array.isArray(links) && links.length > 0;
-    shouldRenderAsLink = hasLinks; // Enable links only if present in rendered mode
+    // Render as link if it has drill links OR if a custom onClick handler is provided
+    shouldRenderAsLink = hasLinks || !!onClick; 
   }
 
   const handleDrill = (event: React.MouseEvent | React.KeyboardEvent) => {
     // This function should only be called if shouldRenderAsLink is true
-    if (!shouldRenderAsLink || !links) return;
+    if (!shouldRenderAsLink) return;
     
     // Stop propagation to prevent parent handlers from firing
     event.stopPropagation();
     event.preventDefault();
 
-    LookerCharts.Utils.openDrillMenu({
-      links: links,
-      event: event.nativeEvent,
-    });
+    if (onClick) {
+        onClick(event);
+        return;
+    }
+
+    if (links && links.length > 0) {
+        LookerCharts.Utils.openDrillMenu({
+            links: links,
+            event: event.nativeEvent,
+        });
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -72,7 +85,7 @@ export const DrillableCell: React.FC<DrillableCellProps> = ({ cell, className, s
         onClick={handleDrill}
         onKeyDown={handleKeyDown}
         className={className}
-        title="Click to drill down"
+        title={onClick ? "Click to filter" : "Click to drill down"}
         style={{
             cursor: 'pointer',
             textDecoration: 'underline',

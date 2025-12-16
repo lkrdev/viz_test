@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { createContext, useContext, useMemo, ReactNode } from 'react';
-import { VisConfig, VisData, VisQueryResponse } from '../types';
+import { VisConfig, VisData, VisQueryResponse, VisUpdateDetails } from '../types';
 
 interface VizContextType {
   data: VisData;
   config: VisConfig;
   queryResponse: VisQueryResponse;
+  details?: VisUpdateDetails;
   addDynamicOptions: (newOptions: any, currentConfig: any) => void;
   updateConfig: (newConfig: any) => void;
   onRenderComplete?: () => void;
@@ -18,20 +19,22 @@ interface VizProviderProps {
   data: VisData;
   config: VisConfig;
   queryResponse: VisQueryResponse;
+  details?: VisUpdateDetails;
   addDynamicOptions: (newOptions: any, currentConfig: any) => void;
   updateConfig: (newConfig: any) => void;
   onRenderComplete?: () => void;
 }
 
-export const VizProvider: React.FC<VizProviderProps> = ({ children, data, config, queryResponse, addDynamicOptions, updateConfig, onRenderComplete }) => {
+export const VizProvider: React.FC<VizProviderProps> = ({ children, data, config, queryResponse, details, addDynamicOptions, updateConfig, onRenderComplete }) => {
   const value = useMemo(() => ({
     data,
     config,
     queryResponse,
+    details,
     addDynamicOptions,
     updateConfig,
     onRenderComplete
-  }), [data, config, queryResponse, addDynamicOptions, updateConfig, onRenderComplete]);
+  }), [data, config, queryResponse, details, addDynamicOptions, updateConfig, onRenderComplete]);
 
   return (
     <VizContext.Provider value={value}>

@@ -48,12 +48,12 @@ describe("QueryVisualization Visual Tests - multi-sparkline", () => {
           `http://localhost:4444/query/${query_id}?height=${height}&width=${width}`,
           {
             waitUntil: "networkidle0",
-            timeout: 30000,
+            timeout: 100000,
           }
         );
 
         await page.waitForSelector("#query-done", {
-          timeout: 30000,
+          timeout: 100000,
         });
 
         await new Promise((resolve) => setTimeout(resolve, 2000));

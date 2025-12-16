@@ -31,6 +31,26 @@
 
 ---
 
+# Styling Guidelines for Looker Custom Visualizations
+
+To ensure your custom visualization integrates seamlessly with Looker dashboards and themes, strictly adhere to the following styling guidelines:
+
+1.  **Background Color:**
+    -   **Default to Transparent:** Always set the default background color of your visualization container to `transparent`. This allows the dashboard tile's background color (set by the Looker theme) to show through.
+    -   **Configurable Option:** Provide a `background_color` option in the visualization settings, defaulting to `transparent`. This gives users control if they need a specific background.
+    -   **Implementation:** Apply this style to the root container of your visualization.
+
+2.  **Font Families:**
+    -   **Inherit Fonts:** Use `font-family: inherit` or Looker's standard font stack (e.g., `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`) to match the dashboard's typography. Avoid hardcoding exotic fonts unless specifically requested.
+
+3.  **Text Colors:**
+    -   **Contrast:** Ensure text colors have sufficient contrast against the background. If the background is transparent, consider how text will look on both light and dark dashboard themes.
+    -   **Theme Colors:** Whenever possible, use colors derived from the query response (if available) or standard Looker theme colors for charts and data elements.
+
+4.  **Sizing and Responsiveness:**
+    -   **100% Width/Height:** Your root container should usually take up `100%` of the available width and height to fill the iframe.
+    -   **Overflow Handling:** Handle overflow gracefully (e.g., `overflow: auto` or `hidden`) to prevent scrollbars from appearing unexpectedly on the dashboard tile.
+
 # Agent Requirements (mandatory checks & behavior)
 
 These rules must be enforced by the automated agent before running tests or opening a PR.

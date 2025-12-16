@@ -24,6 +24,14 @@ const vis: CustomVisualizationDefinition = {
       display: 'text',
       section: 'Config',
       order: 1,
+    },
+    background_color: {
+        type: 'string',
+        label: 'Background Color',
+        default: 'transparent',
+        display: 'color',
+        section: 'Style',
+        order: 2,
     }
   },
 
@@ -58,7 +66,7 @@ const vis: CustomVisualizationDefinition = {
       };
 
     root.render(
-      <VizProvider data={[]} config={config} queryResponse={{data: [], fields: {}, pivots: []}} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig}>
+      <VizProvider data={[]} config={config} queryResponse={{data: [], fields: {}, pivots: []}} details={undefined} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig}>
         <LookerCustomVizLayout />
       </VizProvider>
     )
@@ -112,7 +120,7 @@ const vis: CustomVisualizationDefinition = {
 
     if (root) {
         root.render(
-        <VizProvider data={data} config={config} queryResponse={queryResponse} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig} onRenderComplete={done}>
+        <VizProvider data={data} config={config} queryResponse={queryResponse} details={details} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig} onRenderComplete={done}>
             <LookerCustomVizLayout />
         </VizProvider>
         )

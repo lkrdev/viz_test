@@ -2,9 +2,10 @@ import React, { useEffect } from 'react'
 import { useViz } from './VizContext';
 import { DrillableCell } from './DrillableCell';
 import { Cell } from '../types';
+import { useCrossFilter } from '../hooks/useCrossFilter';
 
 const LookerCustomVizLayout: React.FC = () => {
-  const { data, config, onRenderComplete } = useViz();
+  const { data, config, onRenderComplete, queryResponse } = useViz();
 
   useEffect(() => {
     // Signal to Looker that the visualization is rendered
@@ -19,9 +20,15 @@ const LookerCustomVizLayout: React.FC = () => {
 
   // Extract headers from the first row for the table
   const headers = data.length > 0 ? Object.keys(data[0]) : [];
+  const bg = config.background_color || 'transparent';
+
+  // Identify dimension fields
+  const dimensionNames = new Set(
+      queryResponse?.fields?.dimensions?.map(d => d.name) || []
+  );
   
   return (
-    <div className="viz-container">
+    <div className="viz-container" style={{ backgroundColor: bg }}>
         <h1>{config.title_text}</h1>
         <div className="info-box">
             <p><strong>Row Count:</strong> {data.length}</p>
@@ -39,15 +46,27 @@ const LookerCustomVizLayout: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.slice(0,100).map((row, index) => (
-                            <tr key={index} style={{ borderBottom: '1px solid #eee' }}>
-                                {headers.map(header => (
-                                    <td key={header} style={{ padding: '8px' }}>
-                                        <DrillableCell cell={row[header] as Cell} />
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
+                        {data.slice(0,100).map((row, index) => {
+                            // Use the cross-filter hook for row-level styling and click handling
+                            // eslint-disable-next-line
+                            const { style, onClick } = useCrossFilter(row);
+
+                            return (
+                                <tr key={index} style={{ borderBottom: '1px solid #eee', ...style }}>
+                                    {headers.map(header => {
+                                        const isDimension = dimensionNames.has(header);
+                                        return (
+                                            <td key={header} style={{ padding: '8px' }}>
+                                                <DrillableCell 
+                                                    cell={row[header] as Cell} 
+                                                    onClick={isDimension ? onClick : undefined}
+                                                />
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
