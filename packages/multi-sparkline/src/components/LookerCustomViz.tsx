@@ -7,6 +7,7 @@ import { LinearGradient } from '@visx/gradient';
 import { curveMonotoneX } from '@visx/curve';
 import { ParentSize } from '@visx/responsive';
 import { extent, max, min } from 'd3-array';
+import { useCrossFilter } from '../hooks/useCrossFilter';
 
 // Format helper
 const formatPercent = (val: number) => `${(val * 100).toFixed(2)}%`;
@@ -73,16 +74,13 @@ const LookerCustomVizLayout: React.FC = () => {
           return null;
       }
       const dims = queryResponse.fields.dimensions;
-      const measures = queryResponse.fields.measures;
-
-      // We need at least 2 dimensions: Date and Grouping
+      const groupDim = dims[1]; // We need at least 2 dimensions: Date and Grouping
       const dateDim = dims[0];
-      const groupDim = dims[1];
       const imageDim = dims.length > 2 ? dims[2] : null;
 
       // We need at least 1 measure
-      if (measures.length === 0) return null;
-      const measure = measures[0];
+      if (queryResponse.fields.measures.length === 0) return null;
+      const measure = queryResponse.fields.measures[0];
 
       const groups = new Map();
 
@@ -149,49 +147,59 @@ const LookerCustomVizLayout: React.FC = () => {
   const lineColor = config.line_color || '#ff7f0e';
   const upColor = config.up_color || '#2ca02c';
   const downColor = config.down_color || '#d62728';
+  const bg = config.background_color || 'transparent';
 
   return (
-    <div className="viz-container" style={{ fontFamily: 'sans-serif', padding: '10px' }}>
-        {processedData.map((item, i) => (
-            <div key={i} style={{ borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '15px', overflow: 'hidden', flexShrink: 0 }}>
-                        {item.imageCell && item.imageCell.value ? (
-                            <img src={item.imageCell.value} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        ) : (
-                             // Default logo placeholder
-                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="16"></line>
-                                <line x1="8" y1="12" x2="16" y2="12"></line>
-                             </svg>
-                        )}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            <DrillableCell cell={item.labelCell} />
+    <div className="viz-container" style={{ fontFamily: 'sans-serif', padding: '10px', backgroundColor: bg }}>
+        {processedData.map((item, i) => {
+            // Get a representative row for cross-filtering (any row in the group should work for the group dimension)
+            const representativeRow = item.data.length > 0 ? item.data[0].row : null;
+            
+            // Use the cross-filter hook for row-level styling and click handling
+            // eslint-disable-next-line
+            const { style, onClick: onLabelClick } = useCrossFilter(representativeRow);
+
+            return (
+                <div key={i} style={{ borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', flexDirection: 'column', ...style }}>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '15px', overflow: 'hidden', flexShrink: 0 }}>
+                            {item.imageCell && item.imageCell.value ? (
+                                <img src={item.imageCell.value} alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                            ) : (
+                                // Default logo placeholder
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                </svg>
+                            )}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '16px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <DrillableCell cell={item.labelCell} onClick={onLabelClick} />
+                            </div>
+                        </div>
+                        <div style={{ textAlign: 'right', marginLeft: '10px' }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
+                                {item.current && (
+                                    <DrillableCell cell={item.current.row[item.measureName]} />
+                                )}
+                            </div>
+                            <div style={{ color: item.change >= 0 ? upColor : downColor, fontSize: '14px' }}>
+                                {item.change >= 0 ? '+' : ''}{formatPercent(item.change)}
+                            </div>
                         </div>
                     </div>
-                    <div style={{ textAlign: 'right', marginLeft: '10px' }}>
-                        <div style={{ fontWeight: 'bold', fontSize: '16px' }}>
-                             {item.current && (
-                                 <DrillableCell cell={item.current.row[item.measureName]} />
-                             )}
-                        </div>
-                        <div style={{ color: item.change >= 0 ? upColor : downColor, fontSize: '14px' }}>
-                            {item.change >= 0 ? '+' : ''}{formatPercent(item.change)}
-                        </div>
+                    <div style={{ height: '60px', width: '100%' }}>
+                        <ParentSize>
+                            {({ width, height }) => (
+                                <Sparkline width={width} height={height} data={item.data} color={lineColor} />
+                            )}
+                        </ParentSize>
                     </div>
                 </div>
-                <div style={{ height: '60px', width: '100%' }}>
-                    <ParentSize>
-                        {({ width, height }) => (
-                            <Sparkline width={width} height={height} data={item.data} color={lineColor} />
-                        )}
-                    </ParentSize>
-                </div>
-            </div>
-        ))}
+            );
+        })}
     </div>
   );
 };

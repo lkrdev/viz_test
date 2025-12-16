@@ -2,7 +2,7 @@ import { Query } from "../../../types";
 
 const queries: Query[] = [
   {
-    query_id: "WI9e1KGncX4zhZ2Qy3o1B",
+    query_id: "Sh2nmS8rnvv3wTCvK5jJnhhDdHZFyWKG",
     height: 800,
     width: 600,
     name: "Multi Sparkline"
