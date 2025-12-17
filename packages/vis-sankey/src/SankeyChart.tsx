@@ -48,15 +48,6 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
 
   return (
     <div style={{ position: "relative" }}>
-       <style>{`
-        @keyframes sankey-fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .sankey-element {
-          animation: sankey-fade-in 0.6s ease-out forwards;
-        }
-      `}</style>
       <svg width={width} height={height}>
         <Sankey
           root={data}
@@ -109,15 +100,13 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                           vertical={false}
                         />
                         <path
-                          className="sankey-element"
                           d={pathString}
                           fill={`url(#${gradientId})`}
                           stroke="none"
                           opacity={currentOpacity}
                           style={{
                             transition: 'opacity 0.2s ease',
-                            cursor: link.drillLinks?.length ? 'pointer' : 'default',
-                            animationDelay: `${i * 5}ms`
+                            cursor: link.drillLinks?.length ? 'pointer' : 'default'
                           }}
                           onMouseEnter={(e) => {
                             setHighlighted({ type: 'link', index: i });
@@ -178,7 +167,7 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                     const hasDrills = node.drillLinks && node.drillLinks.length > 0;
 
                     return (
-                      <Group key={`node-${i}`} top={node.y0} left={node.x0} className="sankey-element" style={{ animationDelay: `${i * 10}ms` }}>
+                      <Group key={`node-${i}`} top={node.y0} left={node.x0}>
                         <rect
                           id={`rect-${i}`}
                           width={Math.max(0, node.x1 - node.x0)}
