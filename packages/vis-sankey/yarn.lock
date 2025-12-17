@@ -1168,7 +1168,7 @@
   resolved "https://registry.yarnpkg.com/@types/d3-random/-/d3-random-1.1.5.tgz#bcb06a6add9ed03b07d750a176e59c73591f0fca"
   integrity sha512-gB5CR+7xYMj56pt5zmSyDBjTNMEy96PdfUb2qBaAT9bmPcf4P/YHfhhTI5y8JoiqaSRLJY+3mqtaE9loBgB6Ng==
 
-"@types/d3-sankey@^0.12.4":
+"@types/d3-sankey@^0.12.4", "@types/d3-sankey@^0.12.5":
   version "0.12.5"
   resolved "https://registry.yarnpkg.com/@types/d3-sankey/-/d3-sankey-0.12.5.tgz#9b79ff5768250cfd8c6340b167c409a0374f40bd"
   integrity sha512-/3RZSew0cLAtzGQ+C89hq/Rp3H20QJuVRSqFy6RKLe7E0B8kd2iOS1oBsodrgds4PcNVpqWhdUEng/SHvBcJ6Q==

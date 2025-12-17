@@ -3,7 +3,6 @@ import { format as SSF } from "ssf";
 
 export interface SankeyNode {
   name: string;
-  index?: number;
   drillLinks?: any[];
 }
 
@@ -25,108 +24,116 @@ export function transformData(
   measure: any,
   config: any
 ): SankeyData {
-  const nodes = new Set<string>();
-  const links: SankeyLink[] = [];
-
-  // Map to store drill links for each unique node identifier
-  const nodeDrillLinksMap = new Map<string, any[]>();
+  const nodeMap = new Map<string, { name: string, drillLinks: any[] }>();
+  const linkMap = new Map<string, SankeyLink>();
 
   // Determine if we should plot null points
   const showNullPoints = config.show_null_points !== false;
 
   data.forEach((d: any) => {
     const path: string[] = [];
-    const rowDrillLinks: any[] = [];
+    const pathDims: any[] = [];
 
-    // Collect all drill links for this row first
-    // In Looker, drill links are usually associated with specific cells (dimensions/measures).
-    // The previous implementation aggregated ALL links in the row for the edge.
-    // For nodes, we should probably associate the links from the specific dimension that created the node.
-
-    // Let's refine the logic:
-    // Iterate dimensions. d[dim.name] has .value and .links.
-
+    // Extract dimension values for the path
     for (const dim of dimensions) {
       if (d[dim.name].value === null && !showNullPoints) break;
       path.push(d[dim.name].value + "");
+      pathDims.push(dim);
     }
 
+    // Create links between consecutive dimensions in the path
     path.forEach((p: string, i: number) => {
-       // Unique identifier
-       const nodeIdentifier = path[i] + i + `len:${path[i].length}`;
-       nodes.add(nodeIdentifier);
+      // Handle Node creation/update
+      // Logic: Value + index + length
+      const nodeName = p + i + `len:${p.length}`;
 
-       // Get drill links for this specific dimension
-       // dimensions[i] corresponds to path[i]
-       if (dimensions[i] && d[dimensions[i].name] && d[dimensions[i].name].links) {
-           const specificLinks = d[dimensions[i].name].links;
-           if (!nodeDrillLinksMap.has(nodeIdentifier)) {
-               nodeDrillLinksMap.set(nodeIdentifier, []);
-           }
-           // Add links if not already present (avoid duplicates if multiple rows have same node?
-           // Actually, Sankey nodes aggregate multiple rows. "California" might appear in 50 rows.
-           // If we just concat all links, we might have 50 "Filter by California" links.
-           // Usually, Looker drill links are specific to the filter context.
-           // If we aggregate, we might just want the first set, or unique sets.
-           // However, standard Looker viz often just takes the first valid set of links for a grouped entity or merges them.
-           // Let's append them all and let the Drill Menu handle it, or simpler: just take the set from the first occurrence?
-           // If the drill is "Filter on State=California", it's the same for all rows.
-           // So taking the first one is safe for dimensions.
+      // Get drill links for this node
+      // The node corresponds to the dimension at index i
+      const dim = pathDims[i];
+      const nodeDrills = d[dim.name]?.links || [];
 
-           const existing = nodeDrillLinksMap.get(nodeIdentifier);
-           if (existing && existing.length === 0) {
-               specificLinks.forEach((l: any) => existing.push(l));
-           }
-       }
+      if (!nodeMap.has(nodeName)) {
+        nodeMap.set(nodeName, {
+          name: nodeName, // Temporarily store full ID
+          drillLinks: nodeDrills
+        });
+      } else {
+        // Optional: merge drill links if they differ, but usually for same value they are same.
+        // We'll keep the first set found.
+      }
 
-       if (i === path.length - 1) return;
+      if (i === path.length - 1) return;
 
-       const sourceName = nodeIdentifier;
-       const targetName = path[i + 1] + (i + 1) + `len:${path[i + 1].length}`;
+      const sourceName = nodeName;
+      const targetName = path[i + 1] + (i + 1) + `len:${path[i + 1].length}`;
 
-       // For Links (Edges), we usually want the drill links associated with the measure or the full row context?
-       // The legacy code aggregated ALL links in the row `d`.
-       // "Setup drill links... for (const key in d)..."
-       // We will keep that behavior for Edges.
+      // Ensure target node exists too (it will be processed as source in next iter,
+      // but for the last element it won't be a source)
+      if (!nodeMap.has(targetName)) {
+         const targetDim = pathDims[i+1];
+         const targetDrills = d[targetDim.name]?.links || [];
+         nodeMap.set(targetName, {
+           name: targetName,
+           drillLinks: targetDrills
+         });
+      }
 
-       const linkDrillLinks: any[] = [];
-       for (const key in d) {
-          if (d[key].links) {
-            d[key].links.forEach((link: any) => {
-              linkDrillLinks.push(link);
-            });
-          }
-       }
+      const linkKey = `${sourceName}-${targetName}`;
+      const value = +d[measure.name].value;
 
-       links.push({
-        source: sourceName,
-        target: targetName,
-        value: +d[measure.name].value,
-        drillLinks: linkDrillLinks,
-      });
+      // Collect drill links for the LINK (usually aggregate of row drills or measure drills)
+      // The legacy code put ALL row drills on the link.
+      const rowDrills: any[] = [];
+      for (const key in d) {
+        if (d[key].links) {
+          d[key].links.forEach((link: any) => {
+            rowDrills.push(link);
+          });
+        }
+      }
+
+      if (linkMap.has(linkKey)) {
+        const existingLink = linkMap.get(linkKey)!;
+        existingLink.value += value;
+        // Aggregate unique drill links? For now just concat
+         existingLink.drillLinks = (existingLink.drillLinks || []).concat(rowDrills);
+      } else {
+        linkMap.set(linkKey, {
+          source: sourceName,
+          target: targetName,
+          value: value,
+          drillLinks: rowDrills,
+        });
+      }
     });
   });
 
-  // Convert Set to Array for node indexing
-  const nodesArray = Array.from(nodes);
+  // Convert Map to Array for node indexing
+  const nodesArray = Array.from(nodeMap.values());
+  const links = Array.from(linkMap.values());
 
   // Map link source/target to indices
+  // We need to map the source/target *names* to the index in nodesArray
+  // nodesArray contains objects { name: "...", drillLinks: ... }
+  const nodeNameIndexMap = new Map<string, number>();
+  nodesArray.forEach((n, idx) => nodeNameIndexMap.set(n.name, idx));
+
   const indexedLinks = links.map((link) => {
     return {
       ...link,
-      source: nodesArray.indexOf(link.source as string),
-      target: nodesArray.indexOf(link.target as string),
+      source: nodeNameIndexMap.get(link.source as string)!,
+      target: nodeNameIndexMap.get(link.target as string)!,
     };
   });
 
-  // Clean up node names (removing the unique ID suffix) for display
-  const finalNodes = nodesArray.map((nodeIdentifier) => {
-    const parts = nodeIdentifier.split("len:");
+  // Clean up node names for display
+  const finalNodes = nodesArray.map((nodeObj) => {
+    const parts = nodeObj.name.split("len:");
     const originalLength = parseInt(parts[1], 10);
 
     return {
-      name: nodeIdentifier.slice(0, originalLength),
-      drillLinks: nodeDrillLinksMap.get(nodeIdentifier) || [],
+      name: nodeObj.name.slice(0, originalLength),
+      drillLinks: nodeObj.drillLinks
     };
   });
 

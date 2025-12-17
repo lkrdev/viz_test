@@ -5,8 +5,8 @@ import { LinearGradient } from "@visx/gradient";
 import { scaleOrdinal } from "d3-scale";
 import { Text } from "@visx/text";
 import { Tooltip, useTooltip, defaultStyles } from "@visx/tooltip";
+import { sankeyLinkHorizontal } from "d3-sankey";
 import { SankeyData } from "./utils";
-import { format as SSF } from "ssf";
 
 interface SankeyChartProps {
   data: SankeyData;
@@ -27,9 +27,9 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
   const [highlighted, setHighlighted] = useState<{ type: 'node' | 'link'; index: number } | null>(null);
 
   // Parse config options
-  const nodeWidth = config.node_width || 10;
-  const nodePadding = config.node_padding || 12;
-  const linkOpacity = config.link_opacity || 0.4;
+  const nodeWidth = Number(config.node_width) || 10;
+  const nodePadding = Number(config.node_padding) || 12;
+  const linkOpacity = Number(config.link_opacity) || 0.4;
   const labelType = config.label_type || 'name';
   const showValuesInTooltip = config.show_tooltip_values !== false;
 
@@ -42,18 +42,21 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
   const colorScale = useMemo(() => scaleOrdinal(colorRange), [colorRange]);
   const getNodeColor = (name: string) => colorScale(name.split(" ")[0]) as string;
 
-  // Animation style for entrance
-  const [show, setShow] = useState(false);
-  React.useEffect(() => {
-    setShow(true);
-  }, []);
-
   const TooltipAny = Tooltip as any;
 
   if (width < 10 || height < 10) return null;
 
   return (
     <div style={{ position: "relative" }}>
+       <style>{`
+        @keyframes sankey-fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .sankey-element {
+          animation: sankey-fade-in 0.6s ease-out forwards;
+        }
+      `}</style>
       <svg width={width} height={height}>
         <Sankey
           root={data}
@@ -66,9 +69,14 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
           nodeSort={undefined} // Auto sort
         >
           {(sankeyProps) => {
-            const { graph } = sankeyProps as any;
-            const links = graph.links || [];
-            const nodes = graph.nodes || [];
+            const { data } = sankeyProps as any;
+
+            if (!data) return null;
+
+            const links = data.links || [];
+            const nodes = data.nodes || [];
+
+            const pathGenerator = sankeyLinkHorizontal();
 
             return (
               <Group>
@@ -77,9 +85,9 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                   {links.map((link: any, i: number) => {
                     const sourceName = link.source.name;
                     const targetName = link.target.name;
-                    const id = `gradient-${i}`;
+                    const pathString = pathGenerator(link) || undefined;
+                    const gradientId = `sankey-gradient-${i}`;
 
-                    // Determine opacity based on highlight state
                     let currentOpacity = linkOpacity;
                     if (highlighted) {
                       if (highlighted.type === 'link' && highlighted.index === i) {
@@ -95,18 +103,22 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                     return (
                       <React.Fragment key={`link-${i}`}>
                         <LinearGradient
-                          id={id}
+                          id={gradientId}
                           from={getNodeColor(sourceName)}
                           to={getNodeColor(targetName)}
                           vertical={false}
                         />
                         <path
-                          d={link.path}
-                          stroke={`url(#${id})`}
-                          strokeWidth={Math.max(1, link.width)}
-                          fill="none"
+                          className="sankey-element"
+                          d={pathString}
+                          fill={`url(#${gradientId})`}
+                          stroke="none"
                           opacity={currentOpacity}
-                          style={{ transition: 'opacity 0.2s ease', cursor: link.drillLinks?.length ? 'pointer' : 'default' }}
+                          style={{
+                            transition: 'opacity 0.2s ease',
+                            cursor: link.drillLinks?.length ? 'pointer' : 'default',
+                            animationDelay: `${i * 5}ms`
+                          }}
                           onMouseEnter={(e) => {
                             setHighlighted({ type: 'link', index: i });
                              if (showValuesInTooltip) {
@@ -134,7 +146,6 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                             hideTooltip();
                           }}
                           onClick={(event) => {
-                            // Drill menu
                             if (link.drillLinks && link.drillLinks.length > 0) {
                               lookerCharts.Utils.openDrillMenu({
                                 links: link.drillLinks,
@@ -151,11 +162,10 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                 {/* Nodes */}
                 <Group>
                   {nodes.map((node: any, i: number) => {
-                    // Highlight logic
                     let isDimmed = false;
                     if (highlighted) {
                       if (highlighted.type === 'node' && highlighted.index !== i) {
-                        isDimmed = true; // Dim other nodes
+                        isDimmed = true;
                       }
                       if (highlighted.type === 'link') {
                          const link = links[highlighted.index];
@@ -168,19 +178,17 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                     const hasDrills = node.drillLinks && node.drillLinks.length > 0;
 
                     return (
-                      <Group key={`node-${i}`} top={node.y0} left={node.x0}>
+                      <Group key={`node-${i}`} top={node.y0} left={node.x0} className="sankey-element" style={{ animationDelay: `${i * 10}ms` }}>
                         <rect
                           id={`rect-${i}`}
                           width={Math.max(0, node.x1 - node.x0)}
                           height={Math.max(0, node.y1 - node.y0)}
                           fill={getNodeColor(node.name)}
                           stroke="#555"
-                          strokeWidth={1} // Add stroke to match old viz
+                          strokeWidth={1}
                           opacity={isDimmed ? 0.5 : 1}
                           style={{
-                            transition: 'opacity 0.2s ease, height 0.5s ease',
-                            transformOrigin: 'top',
-                            animation: show ? 'grow 0.8s ease-out' : 'none',
+                            transition: 'opacity 0.2s ease',
                             cursor: hasDrills ? 'pointer' : 'default'
                           }}
                           onMouseEnter={() => setHighlighted({ type: 'node', index: i })}
@@ -195,12 +203,6 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                           }}
                         >
                         </rect>
-                         <style>{`
-                            @keyframes grow {
-                              from { transform: scaleY(0); }
-                              to { transform: scaleY(1); }
-                            }
-                          `}</style>
                         <Text
                           x={node.x0 < width / 2 ? 6 + (node.x1 - node.x0) : -6}
                           y={(node.y1 - node.y0) / 2}
@@ -209,7 +211,7 @@ const SankeyChart: React.FC<SankeyChartProps> = ({
                           fontSize={10}
                           fontWeight="bold"
                           fill="#222"
-                          style={{ pointerEvents: 'none' }} // Let clicks pass through to rect
+                          style={{ pointerEvents: 'none' }}
                         >
                            {labelType === 'name_value' ? `${node.name} (${node.value})` : node.name}
                         </Text>
