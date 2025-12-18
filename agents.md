@@ -83,9 +83,7 @@ Avoid running the entire repository; focus on the specific package.
 
 ### Static Integrity Checks:
 
-* Grep for `DrillableCell` to verify data wrapping.
-* Verify webpack files have not been modified.
-* Ensure `onRenderComplete` is referenced and implemented with the correct logic.
+* Run `yarn test:static-checks` to perform automated static analysis.
 
 ### Puppeteer Checks:
 
