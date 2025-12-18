@@ -2183,6 +2183,14 @@
     "@types/d3-shape" "^1.3.1"
     d3-shape "^1.0.6"
 
+"@visx/event@^3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@visx/event/-/event-3.12.0.tgz#61ea741f9d4b9df75277de25a3bf4f5562add3f9"
+  integrity sha512-9Lvw6qJ0Fi+y1vsC1WspfdIKCxHTb7oy59Uql1uBdPGT8zChP0vuxW0jQNQRDbKgoefj4pCXAFi8+MF1mEtVTw==
+  dependencies:
+    "@types/react" "*"
+    "@visx/point" "3.12.0"
+
 "@visx/gradient@^3.12.0":
   version "3.12.0"
   resolved "https://registry.yarnpkg.com/@visx/gradient/-/gradient-3.12.0.tgz#4898241cdd78ff3003dae584787a4b2dffff1eb7"
@@ -2199,6 +2207,11 @@
     "@types/react" "*"
     classnames "^2.3.1"
     prop-types "^15.6.2"
+
+"@visx/point@3.12.0":
+  version "3.12.0"
+  resolved "https://registry.yarnpkg.com/@visx/point/-/point-3.12.0.tgz#d3eedcbb37acef5ec86550cbacb013a61e7e7eee"
+  integrity sha512-I6UrHoJAEVbx3RORQNupgTiX5EzjuZpiwLPxn8L2mI5nfERotPKi1Yus12Cq2WtXqEBR/WgqTnoImlqOXBykcA==
 
 "@visx/responsive@^3.12.0":
   version "3.12.0"

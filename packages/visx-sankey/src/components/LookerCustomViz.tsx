@@ -3,6 +3,8 @@ import { useViz } from './VizContext';
 import { DrillableCell } from './DrillableCell';
 import { Sankey } from '@visx/sankey';
 import { ParentSize } from '@visx/responsive';
+import { useTooltip, TooltipWithBounds, defaultStyles } from '@visx/tooltip';
+import { localPoint } from '@visx/event';
 import { processSankeyData } from '../utils';
 import { scaleOrdinal } from '@visx/scale';
 import { sankeyLinkHorizontal } from 'd3-sankey';
@@ -12,6 +14,15 @@ declare var LookerCharts: LookerChartUtils;
 
 const LookerCustomVizLayout: React.FC = () => {
   const { data, config, queryResponse, onRenderComplete } = useViz();
+
+  const {
+    tooltipData,
+    tooltipLeft,
+    tooltipTop,
+    tooltipOpen,
+    showTooltip,
+    hideTooltip,
+  } = useTooltip<any>();
 
   const sankeyData = useMemo(() => {
     return processSankeyData(data, queryResponse);
@@ -66,6 +77,7 @@ const LookerCustomVizLayout: React.FC = () => {
         {({ width, height }) => {
             if (width < 10 || height < 10) return null;
             return (
+                <>
                 <Sankey
                     root={sankeyData}
                     nodeWidth={nodeWidth}
@@ -97,10 +109,22 @@ const LookerCustomVizLayout: React.FC = () => {
                                             fill="none"
                                             onClick={handleClick}
                                             style={{ cursor: 'pointer', transition: 'stroke-opacity 0.2s' }}
-                                            onMouseEnter={(e) => { e.currentTarget.style.strokeOpacity = String(Math.min(1, linkOpacity + 0.2)); }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.strokeOpacity = String(linkOpacity); }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.strokeOpacity = String(Math.min(1, linkOpacity + 0.2));
+                                            }}
+                                            onMouseMove={(e) => {
+                                                const point = localPoint(e) || { x: 0, y: 0 };
+                                                showTooltip({
+                                                    tooltipData: link,
+                                                    tooltipLeft: point.x,
+                                                    tooltipTop: point.y,
+                                                });
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                hideTooltip();
+                                                e.currentTarget.style.strokeOpacity = String(linkOpacity);
+                                            }}
                                         >
-                                            <title>{`${link.source.name} -> ${link.target.name}\nValue: ${link.value}`}</title>
                                         </path>
                                     );
                                 })}
@@ -156,6 +180,23 @@ const LookerCustomVizLayout: React.FC = () => {
                         );
                     }}
                 </Sankey>
+                {tooltipOpen && tooltipData && (
+                    // @ts-ignore
+                    <TooltipWithBounds
+                        key={Math.random()}
+                        top={tooltipTop}
+                        left={tooltipLeft}
+                        style={{ ...defaultStyles, backgroundColor: 'rgba(0,0,0,0.9)', color: 'white', zIndex: 100 }}
+                    >
+                        <div style={{ marginBottom: '4px' }}>
+                            <strong>{tooltipData.source.name}</strong> {'\u2192'} <strong>{tooltipData.target.name}</strong>
+                        </div>
+                        <div>
+                            Value: <strong>{tooltipData.value}</strong>
+                        </div>
+                    </TooltipWithBounds>
+                )}
+                </>
             );
         }}
       </ParentSize>
