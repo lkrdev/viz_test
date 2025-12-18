@@ -1,124 +1,115 @@
-# Setup
+# Autonomous Coding Agent: Looker Custom Visualization Instructions
 
-- use yarn for everything, forget that npm exists.
-- if this is your first time running this repository, you can use `yarn init:all` to initialize all the packages and dependencies.
-- if you think you have a problem with node_modules and installed packages, use `yarn clean:all` to clean everything and re-initialize.
-- if you are creating a new package, use the create-test-template.sh script to create the test template.
-
-# Editing
-
-- the top level package.json should not have any dependencies, it should only have scripts.
-- When developing a new or existing visualization, ask the Jules user for query ids. Query ids should be placed in `./test_app/src/__tests__/<package_name>/queries.ts` when provided.
-
-# Testing
-
-- do not use `yarn test:query-visualization --all` or `yarn test:query-render --all` (these run the whole repo). When testing a specific visualization use `yarn test:query-visualization -P <package_name>` or `yarn test:query-render -P <package_name>`.
-
-# Integration Testing
-
-- Ensure the agent uses prefixed `LOOKERSDK` environment variables to run integration tests.
-- Initial Step: Print out just the names of the environment variables the agent has access to.
-- If there are no prefixed `LOOKERSDK` variables, instruct the user to add them to the Codebases section and recreate a new session.
-- Ensure the user provides a query slug for the integration tests upfront. Ask for this immediately if not provided.
-
-# Building a new visualization
-
-- Start with `create-test-template.sh` and `create-visualization-template.sh` to create the test template.
-
-# When to use new packages
-
-- Unless explicitly requested, try to meet requirements using packages already installed. Use `yarn all-npm-packages` to view available packages across the repo.
+This document defines the mandatory order of operations and technical requirements for the autonomous agent when building, testing, and deploying Looker Custom Visualizations.
 
 ---
 
-# Styling Guidelines for Looker Custom Visualizations
+## Phase 1: Environment Initialization & Verification
 
-To ensure your custom visualization integrates seamlessly with Looker dashboards and themes, strictly adhere to the following styling guidelines:
+The agent must ensure the workspace is functional before attempting any implementation.
 
-1.  **Background Color:**
-    -   **Default to Transparent:** Always set the default background color of your visualization container to `transparent`. This allows the dashboard tile's background color (set by the Looker theme) to show through.
-    -   **Configurable Option:** Provide a `background_color` option in the visualization settings, defaulting to `transparent`. This gives users control if they need a specific background.
-    -   **Implementation:** Apply this style to the root container of your visualization.
+### Package Management:
 
-2.  **Font Families:**
-    -   **Inherit Fonts:** Use `font-family: inherit` or Looker's standard font stack (e.g., `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`) to match the dashboard's typography. Avoid hardcoding exotic fonts unless specifically requested.
+* Use `yarn` exclusively. Ignore `npm` completely.
+* **If this is a new session or repository:** Run `yarn init:all`.
+* **If node_modules errors occur:** Run `yarn clean:all` followed by `yarn init:all`.
 
-3.  **Text Colors:**
-    -   **Contrast:** Ensure text colors have sufficient contrast against the background. If the background is transparent, consider how text will look on both light and dark dashboard themes.
-    -   **Theme Colors:** Whenever possible, use colors derived from the query response (if available) or standard Looker theme colors for charts and data elements.
+### Environment Variable Audit:
 
-4.  **Sizing and Responsiveness:**
-    -   **100% Width/Height:** Your root container should usually take up `100%` of the available width and height to fill the iframe.
-    -   **Overflow Handling:** Handle overflow gracefully (e.g., `overflow: auto` or `hidden`) to prevent scrollbars from appearing unexpectedly on the dashboard tile.
+* Print the names of available environment variables.
+* **Mandatory:** Verify the presence of prefixed `LOOKERSDK` variables for integration tests.
+* **Escalation:** If missing, stop and instruct the user to add them to the Codebases section and recreate the session.
 
-# Agent Requirements (mandatory checks & behavior)
+### Template Generation:
 
-These rules must be enforced by the automated agent before running tests or opening a PR.
-
-1) Wrap displayed data points with DrillableCell
-- Every displayed data value (table cells, list items, inline values, etc.) must render using the template's `DrillableCell` component instead of plain text or custom anchor elements.
-- If a custom cell component is used, ensure the clickable/drillable content is implemented with `DrillableCell` (example: `<DrillableCell cell={row[header] as Cell} />`).
-- Rationale: `DrillableCell` centralizes drill menu behavior and accessible keyboard handling; tests and Looker expect that behavior.
-
-2) Call done()/onRenderComplete() only after mount and after animations/async rendering finish
-- Ensure the provided `onRenderComplete` or `done` callback is called only when the UI is fully stable:
-  - If there are no animations/async effects, call `onRenderComplete?.()` on mount/update when rendering is complete.
-  - If animations/transitions/async work are present, wait for their completion (use `animationend`/`transitionend` events or Promises/callbacks provided by the library), then call `onRenderComplete?.()` with a small buffer (50–300ms).
-- Recommended React pattern:
-  - Use `useEffect` watching `data`, `config`, and `onRenderComplete`.
-  - Attach listeners for `animationend`/`transitionend` or await animation Promises, then call `onRenderComplete?.()`; include a fallback timeout (e.g., 5s) to avoid blocking indefinitely.
-- Rationale: the test harness and Looker export renderer rely on this signal to mark the viz as finished; snapshots and exports depend on it.
-
-3) Do NOT change webpack config or webpack versions
-- Do not edit `template/webpack.config.js`.
-- Do not change webpack-related dependencies in `template/package.json` (webpack, webpack-cli, webpack-dev-server, `@webpack-cli/*`, etc.) or their versions.
-- If a webpack change seems necessary, open an issue or ask a repository maintainer instead of making automated changes in a branch/PR.
-- Rationale: CI, dev servers, and workflow depend on the template webpack config and pinned versions; changes can break builds and tests.
+* Run `create-visualization-template.sh` and `create-test-template.sh` to scaffold the new package.
 
 ---
 
-# Additional agent checks & recommended automation
+## Phase 2: Requirements & Data Acquisition
 
-- Static checks (pre-test & pre-PR):
-  - Fail if any new/modified visualization file edits `webpack` files or modifies webpack deps in package files.
-  - Verify that JSX/TSX rendering data cells imports and uses `DrillableCell`.
-  - Verify that `useViz` or `onRenderComplete`/`done` is referenced and used properly (or contains an explicit waiting/fallback comment).
-- Runtime checks:
-  - Keep Puppeteer snapshot tests but add a pre-screenshot assertion to confirm `done`/`onRenderComplete` has been called (the harness already waits for `#query-done`).
-  - Add a visual smoke test that detects DrillableCell-like clickable elements (e.g., `role="button"` or a known drillable class/selector).
-- CI gating:
-  - Block PRs that change `template/webpack.config.js` or update webpack versions without maintainer review (file-change detector).
-  - Block PRs that fail the static grep heuristics for drillable wrappers or render-complete signals.
-- Developer guidance:
-  - Use template components (`DrillableCell`, `VizProvider`, etc.) rather than re-implementing those behaviors.
-  - When adding third-party charting libraries that animate, hook their animation-complete callbacks to `onRenderComplete`.
-- Tests and timeouts:
-  - Do not rely solely on arbitrary sleep buffers in tests; ensure visualizations explicitly signal completion. Use buffers only as a safety net.
+### User Input:
+
+* Immediately ask the user for **Query IDs** and a **Query Slug** (for integration tests).
+* Place Query IDs in `./test_app/src/__tests__/<package_name>/queries.ts`.
+
+### Library Audit:
+
+* Run `yarn all-npm-packages` to view available dependencies.
+* **Rule:** Use existing packages unless the visualization requirement explicitly demands a new library.
 
 ---
 
-# References (key files)
+## Phase 3: Implementation & Styling Guidelines
 
-- DrillableCell component:
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/src/components/DrillableCell.tsx
-- Template viz showing DrillableCell usage and onRenderComplete:
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/src/components/LookerCustomViz.tsx
-- VizContext and onRenderComplete wiring:
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/src/components/VizContext.tsx
-- Where the Looker plugin wires `done()` to React:
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/src/custom_viz_container.tsx
-- Template webpack config (do not change):
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/webpack.config.js
-- Template package.json (webpack versions; do not change):
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/package.json
-- Test harness that expects a `#query-done` marker:
-  - https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/test_app/src/__tests__/query-visualization.test.ts
+Strictly adhere to these rules to ensure seamless integration into Looker dashboards.
+
+### 1. Mandatory Components & Signals
+
+* **DrillableCell Wrapper:** Every displayed data value (table cells, list items, etc.) must use the template's `DrillableCell` component.
+* *Example:* `<DrillableCell cell={row[header] as Cell} />`
+
+
+* **onRenderComplete / done() Timing:**
+* Call only when the UI is stable (after animations and async rendering).
+* **If using animations:** Listen for `animationend`/`transitionend` or use library-specific callbacks.
+* **Buffer:** Include a 50–300ms buffer after completion before calling the signal.
+* **Safety:** Implement a 5s fallback timeout to ensure the renderer doesn't hang.
+
+
+
+### 2. Styling Standards
+
+* **Background:** Default the root container background to `transparent`.
+* **Config:** Provide a `background_color` option in the viz settings (defaulting to `transparent`).
+* **Sizing:** Use 100% width and height. Handle overflow (`auto` or `hidden`) to prevent iframe scrollbars.
+* **Fonts:** Use `font-family: inherit` or Looker's standard stack to match dashboard typography.
+
+### 3. Build Configuration Lock
+
+* **DO NOT** modify `template/webpack.config.js`.
+* **DO NOT** change webpack-related dependencies or versions in `template/package.json`.
 
 ---
 
-# Agent checklist (run every iteration)
-- [ ] Ensure every displayed data value is rendered via `DrillableCell`.
-- [ ] Ensure `onRenderComplete`/`done` is called only after mount + animations/async finish (use event listeners or library callbacks; include a small buffer).
-- [ ] Do not modify `template/webpack.config.js` or webpack dependency versions in template package files; open an issue if a change is required.
-- [ ] Run static checks (grep for `DrillableCell`; grep for `onRenderComplete` or `done` usage).
-- [ ] Run unit and visual tests; do not open a PR if any of the above fail.
+## Phase 4: Testing & Iteration
+
+Avoid running the entire repository; focus on the specific package.
+
+### Test Execution:
+
+* Use `yarn test:query-visualization -P <package_name>`
+* Use `yarn test:query-render -P <package_name>`
+
+### Static Integrity Checks:
+
+* Grep for `DrillableCell` to verify data wrapping.
+* Verify webpack files have not been modified.
+* Ensure `onRenderComplete` is referenced and implemented with the correct logic.
+
+### Puppeteer Checks:
+
+* The test harness waits for `#query-done`. Confirm the code triggers this by calling `done()`.
+
+---
+
+## Agent Checklist (Run Every Iteration)
+
+* [ ] **Environment:** `yarn init:all` completed; `LOOKERSDK` variables verified.
+* [ ] **Data Points:** All displayed data values wrapped in `DrillableCell`.
+* [ ] **Rendering:** `onRenderComplete` / `done()` triggered after animations with safety buffer/timeout.
+* [ ] **Styling:** Container is 100% W/H with a transparent background by default.
+* [ ] **Config Protection:** No changes made to Webpack configs or versions.
+* [ ] **Testing:** Targeted tests passed using the `-P` flag.
+* [ ] **Packages:** No unnecessary NPM packages added.
+
+---
+
+## Reference Links
+
+* [DrillableCell Source](https://www.google.com/search?q=%23)
+* [Template Reference (Drillable usage)](https://www.google.com/search?q=%23)
+* [VizContext (Rendering logic)](https://www.google.com/search?q=%23)
+* [Test Harness Expectations](https://www.google.com/search?q=%23)
+
+---
