@@ -32,6 +32,11 @@ module.exports = {
     }],
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(d3-color|@looker)/)",
+    "node_modules/(?!((d3-[a-zA-Z0-9-]+)|internmap|@looker)/)",
   ],
+  moduleNameMapper: {
+    "^react$": "<rootDir>/node_modules/react",
+    "^react-dom$": "<rootDir>/node_modules/react-dom",
+    "^react/jsx-runtime$": "<rootDir>/node_modules/react/jsx-runtime",
+  },
 };
