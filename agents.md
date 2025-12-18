@@ -83,7 +83,7 @@ Avoid running the entire repository; focus on the specific package.
 
 ### Static Integrity Checks:
 
-* Run `yarn test:static-checks` to perform automated static analysis.
+* Run `yarn test:static-checks -P <package_name>` to perform automated static analysis.
 
 ### Puppeteer Checks:
 
