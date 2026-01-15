@@ -120,19 +120,24 @@ jobs:
             --async
 
       - name: Update PR Comment
-        if: github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && (success() || failure())
         uses: actions/github-script@v7
         with:
           script: |
             const commentId = '${{ needs.detect-changes.outputs.comment_id }}';
             if (!commentId) return;
             const package = '${{ matrix.package }}';
+            const status = '${{ job.status }}';
+            const icon = status === 'success' ? '✅' : '❌';
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+            const action = status === 'success' ? 'is done' : `failed ([view logs](${runUrl}))`;
+            
             const { data: comment } = await github.rest.issues.getComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: commentId
             });
-            const newBody = `${comment.body}\n- ✅ Package **${package}** is done`;
+            const newBody = `${comment.body}\n- ${icon} Package **${package}** ${action}`;
             await github.rest.issues.updateComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
