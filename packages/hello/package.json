@@ -5,5 +5,11 @@
   "license": "MIT",
   "dependencies": {
     "react": "^18.2.0"
+  },
+  "scripts": {
+    "start": "webpack serve --server-type https",
+    "build": "webpack --config webpack.config.js",
+    "watch": "webpack --config webpack.config.js --watch --progress",
+    "format": "prettier --ignore-path .gitignore --write '**/*.js'"
   }
 }
