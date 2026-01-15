@@ -79,11 +79,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'yarn'
-
-      - name: Initialize Project Environment
-        run: |
-          chmod +x ./scripts/init.sh
-          ./scripts/init.sh
+          cache-dependency-path: test_app/yarn.lock
 
       - name: Run Task for ${{ matrix.package }}
         run: |
