@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     serverMinification: false,
   },
   // Mark Looker SDK packages as external to avoid Turbopack bundling issues
-  serverExternalPackages: ["@looker/sdk", "@looker/sdk-node"],
+  serverExternalPackages: ["@looker/sdk", "@looker/sdk-node", "lookml-parser"],
   devIndicators: false,
 };
 

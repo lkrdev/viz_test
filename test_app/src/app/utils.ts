@@ -1,7 +1,7 @@
 import { DEFAULT_HEIGHT, DEFAULT_WIDTH } from "./constants";
 
 export const safeHWParse = (
-  value: string | number | undefined,
+  value: string | number | undefined | null,
   type: "height" | "width"
 ) => {
   if (typeof value === "number") {
