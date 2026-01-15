@@ -13,7 +13,11 @@ export async function GET(
   const { searchParams } = request.nextUrl;
   const height = searchParams.get("height");
   const width = searchParams.get("width");
-  const vis_type = searchParams.get("vis_type");
+  let vis_type = searchParams.get("vis_type");
+  let local = [process.env.LOOKER_VIZ_PROJECT_NAME, process.env.LOOKER_VIZ_LOCAL_ID].filter(Boolean)
+  if (local.length === 2) {
+    vis_type = local.join("::")
+  }
 
   try {
     const sdk = LookerNodeSDK.init40();
