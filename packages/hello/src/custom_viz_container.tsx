@@ -121,5 +121,3 @@ const vis: CustomVisualizationDefinition = {
 }
 
 looker.plugins.visualizations.add(vis)
-
-console.log("FIND ME")
