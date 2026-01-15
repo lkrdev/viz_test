@@ -2,8 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { LookerCustomVizLayout } from './components/LookerCustomViz';
 import { VizProvider } from "./components/VizContext";
-import './index.css'
-import { Looker, VisualizationDefinition, VisConfig, VisData, VisQueryResponse, VisUpdateDetails } from './types';
+import './index.css';
+import { Looker, VisConfig, VisData, VisQueryResponse, VisualizationDefinition, VisUpdateDetails } from './types';
 
 // Declare the global looker object
 declare var looker: Looker;
@@ -121,3 +121,5 @@ const vis: CustomVisualizationDefinition = {
 }
 
 looker.plugins.visualizations.add(vis)
+
+console.log("FIND ME")
