@@ -1,0 +1,693 @@
+{
+  "project_name": "finance_portfolio_demo",
+  "constant": {
+    "database": {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "@$name",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "value",
+          "value",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "constant",
+      "$name": "database",
+      "value": "looker-private-demo"
+    },
+    "BQML_REMOTE_CONNECTION_ID": {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "@$name",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "value",
+          "value",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        " ",
+        "# replace these defaults\n",
+        "}"
+      ],
+      "$type": "constant",
+      "$name": "BQML_REMOTE_CONNECTION_ID",
+      "value": "us.ecomm-email"
+    },
+    "LOOKER_BIGQUERY_CONNECTION_NAME": {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "@$name",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "value",
+          "value",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        " ",
+        "# replace these defaults\n",
+        "}"
+      ],
+      "$type": "constant",
+      "$name": "LOOKER_BIGQUERY_CONNECTION_NAME",
+      "value": "looker-private-demo"
+    }
+  },
+  "visualization": [
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "candlestick",
+      "label": "candlestick",
+      "file": "visualizations/candlestick.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "company_info",
+      "label": "Display Company Information",
+      "file": "visualizations/company_info.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "target_prices",
+      "label": "Plot target prices",
+      "file": "visualizations/target_prices.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "equity-metric-comparison",
+      "label": "Equity Metric Comparison",
+      "file": "visualizations/two_number_comparison.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  # buy_sell_hold to be removed",
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "buy_sell_hold",
+      "label": "Buy/Sell/Hold Recommendation",
+      "file": "visualizations/analyst_recommendation.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "stockvisualizationcard",
+      "label": "Stock visualization card with format selection",
+      "file": "visualizations/stock_visualization_card.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "twonumflex",
+      "label": "Two number comparison with flexible subtitles",
+      "file": "visualizations/two_number_comparison_flex.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "portfolio-overview",
+      "label": "Portfolio Overview",
+      "file": "visualizations/portfolio_viz.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "stock_sector_heatmap",
+      "label": "Stock Sector Heatmap",
+      "file": "visualizations/stock_sector_heatmap.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "crypto_heatmap",
+      "label": "Cryptocurrency Heatmap",
+      "file": "visualizations/crypto_heatmap.js"
+    },
+    {
+      "$strings": [
+        "@$type",
+        ":",
+        " ",
+        "{",
+        "\n  ",
+        [
+          "id",
+          "id",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "label",
+          "label",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n  ",
+        [
+          "file",
+          "file",
+          ":",
+          " ",
+          "\"",
+          "@",
+          "\""
+        ],
+        "\n",
+        "}"
+      ],
+      "$type": "visualization",
+      "id": "ticker-scroll",
+      "label": "Ticker Scroll",
+      "file": "visualizations/ticker_scroll.js"
+    }
+  ],
+  "$strings": [
+    "# project_name: \"finance_portfolio_demo\"\n",
+    "\n",
+    "# constant: database {\n",
+    "#   value: \"looker-private-demo\"\n",
+    "# }\n",
+    "\n",
+    "# # # This is the ID of the BQML MODEL setup with the remote connect\n",
+    "# # constant: BQML_REMOTE_CONNECTION_MODEL_ID {\n",
+    "# #   value: \"looker-private-demo.crypto_mvp.stock_info_embeddings_model\" # replace these defaults\n",
+    "# # }\n",
+    "\n",
+    "# # This is the ID of the remote connection setup in BigQuery\n",
+    "# constant: BQML_REMOTE_CONNECTION_ID {\n",
+    "#   value: \"us.ecomm-email\" # replace these defaults\n",
+    "# }\n",
+    "\n",
+    "# # This is the name of the Looker BigQuery Database connection\n",
+    "# constant: LOOKER_BIGQUERY_CONNECTION_NAME {\n",
+    "#   value: \"looker-private-demo\" # replace these defaults\n",
+    "# }\n",
+    "\n",
+    "# visualization: {\n",
+    "#   id: \"candlestick\"\n",
+    "#   label: \"candlestick\"\n",
+    "#   file: \"visualizations/candlestick.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"company_info\"\n",
+    "#   label: \"Display Company Information\"\n",
+    "#   file: \"visualizations/company_info.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"target_prices\"\n",
+    "#   label: \"Plot target prices\"\n",
+    "#   file: \"visualizations/target_prices.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"equity-metric-comparison\"\n",
+    "#   label: \"Equity Metric Comparison\"\n",
+    "#   file: \"visualizations/two_number_comparison.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"buy_sell_hold\"\n",
+    "#   label: \"Buy/Sell/Hold Recommendation\"\n",
+    "#   file: \"visualizations/analyst_recommendation.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"stockvisualizationcard\"\n",
+    "#   label: \"Stock visualization card with format selection\"\n",
+    "#   file: \"visualizations/stock_visualization_card.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"twonumflex\"\n",
+    "#   label: \"Two number comparison with flexible subtitles\"\n",
+    "#   file: \"visualizations/two_number_comparison_flex.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"portfolio-overview\"\n",
+    "#   label: \"Portfolio Overview\"\n",
+    "#   file: \"visualizations/portfolio_viz.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"stock_sector_heatmap\"\n",
+    "#   label: \"Stock Sector Heatmap\"\n",
+    "#   file: \"visualizations/stock_sector_heatmap.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"crypto_heatmap\"\n",
+    "#   label: \"Cryptocurrency Heatmap\"\n",
+    "#   file: \"visualizations/crypto_heatmap.js\"\n",
+    "# }\n",
+    "# visualization: {\n",
+    "#   id: \"ticker-scroll\"\n",
+    "#   label: \"Ticker Scroll\"\n",
+    "#   file: \"visualizations/ticker_scroll.js\"\n",
+    "# }\n",
+    "\n\n",
+    [
+      "project_name",
+      "project_name",
+      ":",
+      " ",
+      "\"",
+      "@",
+      "\""
+    ],
+    "\n\n",
+    "@constant.database",
+    "\n\n",
+    "# # This is the ID of the BQML MODEL setup with the remote connect\n",
+    "# constant: BQML_REMOTE_CONNECTION_MODEL_ID {\n",
+    "#   value: \"looker-private-demo.crypto_mvp.stock_info_embeddings_model\" # replace these defaults\n",
+    "# }\n",
+    "\n",
+    "# This is the ID of the remote connection setup in BigQuery\n",
+    "@constant.BQML_REMOTE_CONNECTION_ID",
+    "\n\n",
+    "# This is the name of the Looker BigQuery Database connection\n",
+    "@constant.LOOKER_BIGQUERY_CONNECTION_NAME",
+    "\n\n",
+    "@visualization.0",
+    "\n",
+    "@visualization.1",
+    "\n",
+    "@visualization.2",
+    "\n",
+    "@visualization.3",
+    "\n",
+    "@visualization.4",
+    "\n",
+    "@visualization.5",
+    "\n",
+    "@visualization.6",
+    "\n",
+    "@visualization.7",
+    "\n",
+    "@visualization.8",
+    "\n",
+    "@visualization.9",
+    "\n",
+    "@visualization.10",
+    "\n"
+  ]
+}
