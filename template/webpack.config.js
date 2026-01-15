@@ -25,11 +25,15 @@ var webpackConfig = {
         modules: [path.join(__dirname, '../src'), 'node_modules'],
     },
     devServer: {
-        hot: true,
-        https: true,
-        static: {
-          directory: path.join(__dirname, 'dist'),
-        },
+      hot: true, 
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+      },
+      static: {
+        directory: path.join(__dirname, 'dist'),
+      },
     },
     module: {
         rules: [
