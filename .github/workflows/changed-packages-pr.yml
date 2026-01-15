@@ -8,7 +8,7 @@ on:
     branches: [ "main" ]
 
 env:
-  BUCKET_NAME: ${{ secrets.GCP_BUCKET_NAME }}
+  BUCKET_NAME: ${{ secrets.CDN_BUCKET_NAME }}
   TYPE: ${{ github.event_name == 'pull_request' && 'draft' || 'prerelease' }}
 
 permissions:
@@ -79,11 +79,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'yarn'
-
-      - name: Initialize Project Environment
-        run: |
-          chmod +x ./scripts/init.sh
-          ./scripts/init.sh
+          cache-dependency-path: test_app/yarn.lock
 
       - name: Run Task for ${{ matrix.package }}
         run: |
@@ -93,14 +89,15 @@ jobs:
 
       - name: Calculate GCS Destination
         run: |
-          DESTINATION="${{ env.BUCKET_NAME }}/viz/${{ env.TYPE }}"
+          PATH_PREFIX="viz/${{ env.TYPE }}"
           
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            DESTINATION="${DESTINATION}/${{ github.event.pull_request.number }}"
+            PATH_PREFIX="${PATH_PREFIX}/${{ github.event.pull_request.number }}"
           fi
           
-          DESTINATION="${DESTINATION}/${{ matrix.package }}"
-          echo "GCS_DESTINATION=$DESTINATION" >> $GITHUB_ENV
+          PATH_PREFIX="${PATH_PREFIX}/${{ matrix.package }}"
+          echo "GCS_PATH_PREFIX=$PATH_PREFIX" >> $GITHUB_ENV
+          echo "GCS_DESTINATION=${{ env.BUCKET_NAME }}/$PATH_PREFIX" >> $GITHUB_ENV
 
       - name: Upload frontend bundle to GCS tag
         uses: google-github-actions/upload-cloud-storage@v2
@@ -117,9 +114,9 @@ jobs:
 
       - name: Invalidate Cloud CDN
         run: |
-          gcloud compute url-maps invalidate-cdn-cache ${{ secrets.GCP_URL_MAP }} \
+          gcloud compute url-maps invalidate-cdn-cache ${{ secrets.CDN_URL_MAP }} \
             --project ${{ secrets.GCP_PROJECT_ID }} \
-            --path=${{ env.GCS_DESTINATION }}/* \
+            --path=/${{ env.GCS_PATH_PREFIX }}/* \
             --async
 
       - name: Update PR Comment
