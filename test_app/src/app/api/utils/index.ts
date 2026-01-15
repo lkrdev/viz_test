@@ -21,13 +21,22 @@ export const getQuery = async (sdk: Looker40SDK, query_id: string) => {
   }
 };
 
-export const getSlugWithVisType = async (sdk: Looker40SDK, slug: string, vis_type: string) => {
+export const getSlugWithVisOverrides = async (
+  sdk: Looker40SDK,
+  slug: string,
+  vis_type?: string | null,
+  vis_config?: any
+) => {
   try {
     const query = await getQuery(sdk, slug);
     if (!query) {
       console.error(`Query not found for slug/id: ${slug}`);
       return null;
     } else {
+      const new_vis_config = { ...query.vis_config, ...(vis_config || {}) };
+      if (vis_type?.length) {
+        new_vis_config.type = vis_type;
+      }
       const newQuery = {
         model: query.model,
         view: query.view,
@@ -42,7 +51,7 @@ export const getSlugWithVisType = async (sdk: Looker40SDK, slug: string, vis_typ
         total: query.total,
         row_total: query.row_total,
         subtotals: query.subtotals,
-        vis_config: { ...query.vis_config, type: vis_type },
+        vis_config: new_vis_config,
         filter_config: query.filter_config,
         visible_ui_sections: query.visible_ui_sections,
         dynamic_fields: query.dynamic_fields,
@@ -51,7 +60,7 @@ export const getSlugWithVisType = async (sdk: Looker40SDK, slug: string, vis_typ
       return sdk.ok(sdk.create_query(newQuery));
     }
   } catch (error) {
-    console.error("Error in getSlugWithVisType:", error);
+    console.error("Error in getSlugWithVisOverrides:", error);
     return null;
   }
 };
