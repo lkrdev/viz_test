@@ -313,7 +313,7 @@ declare module "lookml-parser" {
         addPositions: (project: LookmlProject) => void;
     };
 
-    export function parse(lkml: string): LookmlModel | { view: LookmlView } | { explore: LookmlExplore };
+    export function parse(lkml: string): LookmlModel | { view: LookmlView } | { explore: LookmlExplore } | LookmlManifest;
 
     export function parseFiles(options: ParseFilesOptions & { fileOutput?: 'by-type' }): Promise<LookmlProject>;
     export function parseFiles(options: ParseFilesOptions & { fileOutput: 'by-name' }): Promise<LookmlProject>;

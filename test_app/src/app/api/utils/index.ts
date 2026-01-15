@@ -2,7 +2,7 @@ import { Looker40SDK } from "@looker/sdk";
 import lookmlParser, { LookmlManifest } from 'lookml-parser';
 import { get_project_manifest } from "./sdk_project_methods";
 
-const DEFAULT_LOCAL_URL = "https://localhost:8080/dist/bundle.js"
+const DEFAULT_LOCAL_URL = "https://localhost:8080/bundle.js"
 
 export const getQueryForSlug = async (sdk: Looker40SDK, slug: string) => {
   try {
@@ -59,7 +59,7 @@ export const getSlugWithVisType = async (sdk: Looker40SDK, slug: string, vis_typ
 export const getManifest = async (sdk: Looker40SDK, project_name: string) => {
   try {
     const manifest = await get_project_manifest(sdk, project_name);
-    const parsed_manifest = lookmlParser.parse(manifest) as unknown as LookmlManifest;
+    const parsed_manifest = lookmlParser.parse(manifest) as LookmlManifest;
 
 
     return { parsed_manifest, manifest };

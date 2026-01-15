@@ -17,7 +17,7 @@ export async function GET(
 
   let vis_type = request.nextUrl.searchParams.get("vis_type");
   let local = [process.env.LOOKER_VIZ_PROJECT_NAME, process.env.LOOKER_VIZ_LOCAL_ID].filter(Boolean)
-  if (local.length == 2) {
+  if (local.length === 2) {
     vis_type = local.join("::")
   }
 
