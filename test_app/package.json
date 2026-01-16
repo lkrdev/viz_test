@@ -14,11 +14,11 @@
     "generate-urls": "./scripts/generate-urls.sh $1"
   },
   "dependencies": {
+    "@looker/chatty": "^2.3.10",
     "@looker/components": "^5.0.3",
     "@looker/embed-sdk": "^2.0.6",
     "@looker/sdk": "^25.20.0",
     "@looker/sdk-node": "^25.20.0",
-    "lodash": "^4.17.21",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",

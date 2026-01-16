@@ -46,35 +46,38 @@ const LookerCustomVizLayout: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.slice(0,100).map((row, index) => {
-                            // Use the cross-filter hook for row-level styling and click handling
-                            // eslint-disable-next-line
-                            const { style, onClick } = useCrossFilter(row);
+                            {data.slice(0, 100).map((row, index) => (
+                                <VizRow key={index} row={row} headers={headers} dimensionNames={dimensionNames} />
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <div className="data-preview">No data available</div>
+            )}
+        </div>
+    );
+};
 
-                            return (
-                                <tr key={index} style={{ borderBottom: '1px solid #eee', ...style }}>
-                                    {headers.map(header => {
-                                        const isDimension = dimensionNames.has(header);
-                                        return (
-                                            <td key={header} style={{ padding: '8px' }}>
-                                                <DrillableCell 
-                                                    cell={row[header] as Cell} 
-                                                    onClick={isDimension ? onClick : undefined}
-                                                />
-                                            </td>
-                                        );
-                                    })}
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        ) : (
-            <div className="data-preview">No data available</div>
-        )}
-    </div>
-  );
+const VizRow: React.FC<{ row: any, headers: string[], dimensionNames: Set<string> }> = ({ row, headers, dimensionNames }) => {
+    // eslint-disable-next-line
+    const { style, onClick } = useCrossFilter(row);
+
+    return (
+        <tr style={{ borderBottom: '1px solid #eee', ...style }}>
+            {headers.map(header => {
+                const isDimension = dimensionNames.has(header);
+                return (
+                    <td key={header} style={{ padding: '8px' }}>
+                        <DrillableCell
+                            cell={row[header] as Cell}
+                            onClick={isDimension ? onClick : undefined}
+                        />
+                    </td>
+                );
+            })}
+        </tr>
+    );
 };
 
 export { LookerCustomVizLayout };

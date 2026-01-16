@@ -7,7 +7,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NODE_SCRIPT="${SCRIPT_DIR}/static_checks.js"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SHELL_SCRIPT="${SCRIPT_DIR}/static_checks.sh"
 
 FILES=""
 PACKAGE_NAME=""
@@ -43,4 +44,4 @@ else
   FILES=""
 fi
 
-node "${NODE_SCRIPT}" ${FILES:+--files "$FILES"}
+"${SHELL_SCRIPT}" ${FILES:+--files "$FILES"}

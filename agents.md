@@ -105,9 +105,7 @@ Avoid running the entire repository; focus on the specific package.
 
 ## Reference Links
 
-* [DrillableCell Source](https://www.google.com/search?q=%23)
-* [Template Reference (Drillable usage)](https://www.google.com/search?q=%23)
-* [VizContext (Rendering logic)](https://www.google.com/search?q=%23)
-* [Test Harness Expectations](https://www.google.com/search?q=%23)
-
+* [DrillableCell Source](https://github.com/lkrdev/viz_test/blob/main/template/src/components/DrillableCell.tsx)
+* [Template Reference (Drillable usage)](https://github.com/lkrdev/viz_test/blob/11114c1d6848a9c13c954534a87288232872337e/template/src/components/LookerCustomViz.tsx#L46)
+* [VizContext (Rendering logic)](https://github.com/lkrdev/viz_test/blob/main/template/src/components/VizContext.tsx)
 ---

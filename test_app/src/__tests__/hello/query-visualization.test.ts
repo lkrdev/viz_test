@@ -44,6 +44,16 @@ describe("QueryVisualization Visual Tests - hello", () => {
           deviceScaleFactor: 1,
         });
 
+        const errors: string[] = [];
+        page.on("console", (msg: any) => {
+          if (msg.type() === "error") {
+            errors.push(msg.text());
+          }
+        });
+        page.on("pageerror", (err: any) => {
+          errors.push(err.toString());
+        });
+
         await page.goto(
           `http://localhost:4444/query/${query_id}?height=${height}&width=${width}`,
           {
@@ -55,6 +65,23 @@ describe("QueryVisualization Visual Tests - hello", () => {
         await page.waitForSelector("#query-done", {
           timeout: 30000,
         });
+
+        // Check for console errors
+        if (errors.length > 0) {
+          // Filter out known/ignorable errors if necessary
+          // For now, fail on any error
+          throw new Error(`Console errors detected:\n${errors.join("\n")}`);
+        }
+
+        // Verify events were captured (Basic check for now)
+        const events = await page.evaluate(() => {
+          return window.__LOOKER_EMBED_EVENTS__ || [];
+        });
+        // We expect at least the explore:run:complete event
+        const hasRunComplete = events.some((e: any) => e.type === "explore:run:complete");
+        if (!hasRunComplete) {
+          console.warn("Warning: explore:run:complete event not detected in window.__LOOKER_EMBED_EVENTS__");
+        }
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
