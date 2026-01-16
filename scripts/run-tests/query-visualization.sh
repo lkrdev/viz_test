@@ -58,14 +58,44 @@ elif [[ "$1" == "-P" ]]; then
      echo "Test server already running on port $PORT."
   fi
 
+  # Start Visualization Server
+  echo "Starting visualization server for $PACKAGE_NAME..."
+  cd "packages/$PACKAGE_NAME" && yarn start &
+  VIZ_SERVER_PID=$!
+  cd ../..
+
+  echo "Waiting for visualization server to be ready..."
+  # Wait for bundle.js to be available
+  VIZ_PORT=8080
+  VIZ_URL="https://localhost:$VIZ_PORT/bundle.js"
+  
+  check_viz_server() {
+    curl -k -s -o /dev/null -w "%{http_code}" "$VIZ_URL" | grep -q "200"
+  }
+
+  MAX_RETRIES=60
+  count=0
+  while ! check_viz_server; do
+    sleep 1
+    count=$((count+1))
+    if [ $count -ge $MAX_RETRIES ]; then
+       echo "Error: Visualization server failed to start within $MAX_RETRIES seconds."
+       if [ -n "$SERVER_PID" ]; then kill "$SERVER_PID"; fi
+       if [ -n "$VIZ_SERVER_PID" ]; then kill "$VIZ_SERVER_PID"; fi
+       exit 1
+    fi
+  done
+  echo "Visualization server is ready at $VIZ_URL"
+
   # Run both existing and new chatty tests
   # Using 'yarn test' instead of 'yarn run test:all' as test:all does not exist
-  yarn test -- "$TEST_FILE"
+  # Pass VIZ_URL env var
+  VIZ_URL="$VIZ_URL" yarn test -- "$TEST_FILE"
   EXIT_CODE_1=$?
 
   if [[ -f "$CHATTY_TEST_FILE" ]]; then
       echo "Running chatty visualization tests..."
-      yarn test -- "$CHATTY_TEST_FILE"
+      VIZ_URL="$VIZ_URL" yarn test -- "$CHATTY_TEST_FILE"
       EXIT_CODE_2=$?
   else
       echo "No chatty visualization test found for $PACKAGE_NAME. Skipping."
@@ -75,6 +105,11 @@ elif [[ "$1" == "-P" ]]; then
   if [ -n "$SERVER_PID" ]; then
     echo "Stopping test server (PID: $SERVER_PID)..."
     kill "$SERVER_PID"
+  fi
+
+  if [ -n "$VIZ_SERVER_PID" ]; then
+    echo "Stopping visualization server (PID: $VIZ_SERVER_PID)..."
+    kill "$VIZ_SERVER_PID"
   fi
   
   # Return matching exit code if any failed

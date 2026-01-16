@@ -79,6 +79,7 @@ Avoid running the entire repository; focus on the specific package.
 ### Test Execution:
 
 * Use `yarn test:query-visualization -P <package_name>`
+* **Note:** This script automatically starts the viz dev server (port 8080) and test app (port 4444).
 * Use `yarn test:query-render -P <package_name>`
 
 ### Static Integrity Checks:
