@@ -46,7 +46,7 @@ const viz_id = getVizId(package_name, type, suffix);
 const viz_url = getVizUrl(type, package_name, suffix, version);
 
 const lookml = `visualization: {
-  id: "${full_viz_id}"
+  id: "${viz_id}"
   label: "${package_name} (${type})"
   url: "${viz_url}"
 }`;
