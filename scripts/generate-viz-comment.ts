@@ -42,10 +42,11 @@ if (!process.env.LOOKERSDK_CLIENT_ID || !process.env.LOOKERSDK_CLIENT_SECRET) {
   process.exit(1);
 }
 const viz_id = getVizId(package_name, type, suffix);
+  const full_viz_id = `${process.env.LOOKER_VIZ_PROJECT_NAME}::${viz_id}`;
 const viz_url = getVizUrl(type, package_name, suffix, version);
 
 const lookml = `visualization: {
-  id: "${viz_id}"
+  id: "${full_viz_id}"
   label: "${package_name} (${type})"
   url: "${viz_url}"
 }`;
@@ -63,7 +64,7 @@ if (fs.existsSync(queriesPath)) {
     if (Array.isArray(queries)) {
       for (const q of queries) {
         if (q.query_id) {
-          const newQuery = await getSlugWithVisOverrides(sdk, q.query_id, viz_id, q.vis_config_override);
+          const newQuery = await getSlugWithVisOverrides(sdk, q.query_id, full_viz_id, q.vis_config_override);
           if (newQuery && newQuery.client_id) {
             querySlugs.add(newQuery.client_id);
           }
