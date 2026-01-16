@@ -10,6 +10,7 @@ on:
 env:
   BUCKET_NAME: ${{ secrets.CDN_BUCKET_NAME }}
   TYPE: ${{ github.event_name == 'pull_request' && 'draft' || 'prerelease' }}
+  LOOKERSDK_BASE_URL: ${{ secrets.LOOKERSDK_BASE_URL }}
 
 permissions:
   contents: read
@@ -123,7 +124,6 @@ jobs:
         id: generate-snippet
         if: success() && github.event_name == 'pull_request'
         run: |
-          chmod +x ./scripts/generate-viz-comment.ts
           SNIPPET=$(npx -y tsx ./scripts/generate-viz-comment.ts ${{ matrix.package }} ${{ env.TYPE }} ${{ github.event.pull_request.number }})
           echo "snippet<<EOF" >> $GITHUB_OUTPUT
           echo "$SNIPPET" >> $GITHUB_OUTPUT
