@@ -2,8 +2,6 @@ import { Looker40SDK } from "@looker/sdk";
 import lookmlParser, { LookmlManifest } from 'lookml-parser';
 import { get_project_manifest } from "./sdk_project_methods";
 
-const DEFAULT_LOCAL_URL = "https://localhost:8080/bundle.js"
-
 export const getQueryForSlug = async (sdk: Looker40SDK, slug: string) => {
   try {
     return await sdk.ok(sdk.query_for_slug(slug));
@@ -78,41 +76,4 @@ export const getManifest = async (sdk: Looker40SDK, project_name: string) => {
   }
 }
 
-export const getVizId = (
-  package_name: string,
-  type: DevVisualizationType,
-  suffix?: string | null
-) => {
-  if (process.env.LOOKER_VIZ_PROJECT_NAME?.length && process.env.LOOKER_VIZ_LOCAL_ID?.length && type === "local") {
-    return `${process.env.LOOKER_VIZ_PROJECT_NAME}::${process.env.LOOKER_VIZ_LOCAL_ID}`;
-  }
-  return [package_name, type, suffix].filter(Boolean).join("_");
-}
-
-const PATH_MAP: { [key in DevVisualizationType]: string } = {
-  draft: "draft",
-  prerelease: "prerelease",
-  latest: "latest",
-  version: "v",
-  local: "local"
-}
-
-const DEFAULT_CDN_PATH = "https://cdn.lkr.dev/viz"
-
-export const getVizUrl = (
-  type: DevVisualizationType,
-  id: string,
-  version?: string
-) => {
-  if (process.env.LOOKER_VIZ_PROJECT_NAME?.length && process.env.LOOKER_VIZ_LOCAL_ID?.length && type === "local") {
-    return process.env.LOOKER_VIZ_LOCAL_URL || DEFAULT_LOCAL_URL
-  }
-  const path = process.env.DEFAULT_CDN_PATH || DEFAULT_CDN_PATH;
-  if (type === "version") {
-    if (!version?.length) {
-      throw new Error("Version is required for version type");
-    }
-    return `${path}/${PATH_MAP[type]}/${version}/${id}`;
-  }
-  return `${path}/${PATH_MAP[type]}/${id}`;
-}
+export * from "./viz_utils";
