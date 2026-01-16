@@ -2,7 +2,7 @@ import { LookerNodeSDK } from "@looker/sdk-node";
 import { find } from "lodash";
 import { LookmlVisualization } from "lookml-parser";
 import { NextRequest, NextResponse } from "next/server";
-import { getManifest, getVizId, getVizUrl } from "../utils";
+import { DevVisualizationType, getManifest, getVizId, getVizUrl } from "../utils";
 import { parsedManifestToLookML } from "../utils/parsedManifestToLookML";
 import { update_project_file, withDevMode } from "../utils/sdk_project_methods";
 
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         const new_viz: LookmlVisualization = {
           id: current_viz_id,
           $type: "visualization",
-          url: getVizUrl(type, current_viz_id, version ?? undefined)
+          url: getVizUrl(type, package_name, suffix, version ?? undefined)
         }
         if (!parsed_manifest) {
           parsed_manifest = {
