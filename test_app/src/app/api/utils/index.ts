@@ -2,8 +2,6 @@ import { Looker40SDK } from "@looker/sdk";
 import lookmlParser, { LookmlManifest } from 'lookml-parser';
 import { get_project_manifest } from "./sdk_project_methods";
 
-const DEFAULT_LOCAL_URL = "https://localhost:8080/bundle.js"
-
 export const getQueryForSlug = async (sdk: Looker40SDK, slug: string) => {
   try {
     return await sdk.ok(sdk.query_for_slug(slug));

@@ -1,9 +1,14 @@
-#!/usr/bin/env npx -y tsx
+import { LookerNodeSDK } from "@looker/sdk-node";
+import dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
+import { pathToFileURL } from 'url';
+import { getSlugWithVisOverrides } from '../test_app/src/app/api/utils/index';
 import { DevVisualizationType, getVizId, getVizUrl, PATH_MAP } from '../test_app/src/app/api/utils/viz_utils';
+dotenv.config({ path: path.join(process.cwd(), "test_app", ".env") });
 
-let package_name = process.argv[2];
+async function run() {
+  let package_name = process.argv[2];
 let type = (process.argv[3] || 'draft') as DevVisualizationType;
 const suffix = process.argv[4];
 const version = process.argv[5];
@@ -32,6 +37,10 @@ if (!process.env.LOOKERSDK_BASE_URL) {
   process.exit(1);
 }
 
+if (!process.env.LOOKERSDK_CLIENT_ID || !process.env.LOOKERSDK_CLIENT_SECRET) {
+  console.error('LOOKERSDK_CLIENT_ID or LOOKERSDK_CLIENT_SECRET is not set');
+  process.exit(1);
+}
 const viz_id = getVizId(package_name, type, suffix);
 const viz_url = getVizUrl(type, package_name, suffix, version);
 
@@ -46,18 +55,28 @@ let exploreUrls: string[] = [];
 const queriesPath = path.join(process.cwd(), 'test_app/src/__tests__', package_name, 'queries.ts');
 
 if (fs.existsSync(queriesPath)) {
-  const content = fs.readFileSync(queriesPath, 'utf8');
-  const lines = content.split('\n');
-  const queryIdRegex = /query_id:\s*["']([^"']+)["']/;
+  try {
+    const { default: queries } = await import(pathToFileURL(queriesPath).href);
+    const sdk = LookerNodeSDK.init40();
+    const querySlugs = new Set<string>();
 
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (trimmed.startsWith('//')) return;
-    const match = trimmed.match(queryIdRegex);
-    if (match) {
-      exploreUrls.push(`${process.env.LOOKERSDK_BASE_URL}/x/${match[1]}`);
+    if (Array.isArray(queries)) {
+      for (const q of queries) {
+        if (q.query_id) {
+          const newQuery = await getSlugWithVisOverrides(sdk, q.query_id, viz_id, q.vis_config_override);
+          if (newQuery && newQuery.client_id) {
+            querySlugs.add(newQuery.client_id);
+          }
+        }
+      }
     }
-  });
+
+    querySlugs.forEach(slug => {
+      exploreUrls.push(`${process.env.LOOKERSDK_BASE_URL}/x/${slug}`);
+    });
+  } catch (e) {
+    console.error(`Error processing queries from ${queriesPath}:`, e);
+  }
 }
 
 console.log('### 🛠️ Manifest Entry');
@@ -65,7 +84,13 @@ console.log('```lookml');
 console.log(lookml);
 console.log('```');
 
-if (exploreUrls.length > 0) {
-  console.log('\n### 🔍 Test Explores');
-  exploreUrls.forEach(url => console.log(`- [${url}](${url})`));
+  if (exploreUrls.length > 0) {
+    console.log('\n### 🔍 Test Explores');
+    exploreUrls.forEach(url => console.log(`- [${url}](${url})`));
+  }
 }
+
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

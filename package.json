@@ -12,6 +12,7 @@
     "new:package": "./scripts/new-visualization/create-template.sh $1",
     "new:package-test": "./scripts/new-visualization/create-test-template.sh $1",
     "new": "./scripts/new-visualization/new-package.sh $1",
-    "check-env": "./scripts/check-env.sh"
+    "check-env": "./scripts/check-env.sh",
+    "generate-viz-comment": "npx -p dotenv -p @looker/sdk-node -p @looker/sdk -p lookml-parser -p tsx -y sh -c 'NODE_PATH=$(dirname $(dirname $(which tsx))) tsx ./scripts/generate-viz-comment.ts \"$@\"' _"
   }
 }

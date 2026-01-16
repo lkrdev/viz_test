@@ -1,6 +1,6 @@
 const queries: Query[] = [
   {
-    query_id: "XOXQuTQ5lPloYlPJ3IJmPs",
+    query_id: "kyPOIiJK0pqhyCYpsZN2RF",
     height: 300,
     width: 400,
     vis_config_override: {
@@ -8,12 +8,12 @@ const queries: Query[] = [
     }
   },
   {
-    query_id: "XOXQuTQ5lPloYlPJ3IJmPs",
+    query_id: "kyPOIiJK0pqhyCYpsZN2RF",
     height: 500,
     width: 500,
   },
   {
-    query_id: "XOXQuTQ5lPloYlPJ3IJmPs",
+    query_id: "kyPOIiJK0pqhyCYpsZN2RF",
     height: 300,
     width: 400
   },
