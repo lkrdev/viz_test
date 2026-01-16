@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@looker/chatty": "^2.3.10",
+    "@looker/chatty": "^2.3.10",
     "@looker/components": "^5.0.3",
     "@looker/embed-sdk": "^2.0.6",
     "@looker/sdk": "^25.20.0",
