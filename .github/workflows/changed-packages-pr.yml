@@ -134,6 +134,7 @@ jobs:
         uses: actions/github-script@v7
         env:
           SNIPPET: ${{ steps.generate-snippet.outputs.snippet }}
+          LOOKERSDK_BASE_URL: ${{ env.LOOKERSDK_BASE_URL }}
         with:
           script: |
             const commentId = '${{ needs.detect-changes.outputs.comment_id }}';
