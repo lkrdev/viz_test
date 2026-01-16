@@ -17,10 +17,12 @@ describe("QueryVisualization Visual Tests - hello", () => {
   beforeAll(async () => {
     browser = await puppeteer.launch({
       headless: true,
+      acceptInsecureCerts: true,
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
         "--disable-dev-shm-usage",
+        "--ignore-certificate-errors"
       ],
     });
   });
@@ -56,9 +58,9 @@ describe("QueryVisualization Visual Tests - hello", () => {
         }
 
         await page.goto(url.toString(), {
-            waitUntil: "networkidle0",
-            timeout: 30000,
-          }
+          waitUntil: "networkidle0",
+          timeout: 30000,
+        }
         );
 
         await page.waitForSelector("#query-done", {
