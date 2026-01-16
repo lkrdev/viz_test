@@ -8,7 +8,7 @@ import { AxisLeft, AxisBottom } from "@visx/axis";
 import { GridRows, GridColumns } from "@visx/grid";
 import { Zoom } from "@visx/zoom";
 import { RectClipPath } from "@visx/clip-path";
-import { useCrossFilter } from "../hooks/useCrossFilter";
+import { useInteraction } from "../hooks/useInteraction";
 
 // Fix for TS2786: 'Zoom' cannot be used as a JSX component.
 const ZoomAny = Zoom as any;
@@ -72,7 +72,8 @@ const ScatterPlot = ({ width, height }: { width: number; height: number }) => {
       if (pivots && pivots.length > 0) {
         pivots.forEach((pivot) => {
           const valObj = d[firstMeas.name];
-          const val = valObj && valObj[pivot.key] ? valObj[pivot.key].value : null;
+          const cell = valObj && valObj[pivot.key] ? valObj[pivot.key] : null;
+          const val = cell ? cell.value : null;
 
           if (val !== null) {
             let xVal = d[firstDim.name].value;
@@ -85,6 +86,7 @@ const ScatterPlot = ({ width, height }: { width: number; height: number }) => {
               series: pivot.key,
               row: d,
               pivot: pivot,
+              links: cell?.links,
             });
           }
         });
@@ -93,12 +95,14 @@ const ScatterPlot = ({ width, height }: { width: number; height: number }) => {
         if (xType === "time") {
             xVal = new Date(xVal);
         }
+        const cell = d[firstMeas.name];
         points.push({
           x: xVal,
-          y: d[firstMeas.name].value,
+          y: cell.value,
           series: "default",
           row: d,
           pivot: null,
+          links: cell.links,
         });
       }
     });
@@ -257,7 +261,7 @@ const Point = ({ point, xScale, yScale, xType, seriesKeys, neonColors }: any) =>
   const cy = yScale(point.y);
   const colorIndex = seriesKeys.indexOf(point.series) % neonColors.length;
 
-  const { style, onClick } = useCrossFilter(point.row, point.pivot);
+  const { style, onClick } = useInteraction({ row: point.row, pivot: point.pivot, links: point.links });
 
   return (
     <Circle
@@ -268,7 +272,7 @@ const Point = ({ point, xScale, yScale, xType, seriesKeys, neonColors }: any) =>
       fillOpacity={0.8}
       stroke="#fff"
       strokeWidth={1}
-      style={{ ...style, cursor: onClick ? "pointer" : "default" }}
+      style={{ ...style }}
       onClick={onClick}
     />
   );
