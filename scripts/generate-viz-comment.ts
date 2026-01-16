@@ -60,20 +60,27 @@ if (fs.existsSync(queriesPath)) {
     const { default: queries } = await import(pathToFileURL(queriesPath).href);
     const sdk = LookerNodeSDK.init40();
     const querySlugs = new Set<string>();
+    const new_queries: any[] = []
 
     if (Array.isArray(queries)) {
       for (const q of queries) {
         if (q.query_id) {
           const newQuery = await getSlugWithVisOverrides(sdk, q.query_id, full_viz_id, q.vis_config_override);
           if (newQuery && newQuery.client_id) {
-            querySlugs.add(newQuery.client_id);
+            if (!querySlugs.has(newQuery.client_id)) {
+              querySlugs.add(newQuery.client_id);
+              new_queries.push(newQuery);
+            }
           }
         }
       }
     }
 
-    querySlugs.forEach(slug => {
-      exploreUrls.push(`${process.env.LOOKERSDK_BASE_URL}/x/${slug}`);
+    new_queries.forEach(q => {
+      const u = new URL(`${process.env.LOOKERSDK_BASE_URL}/explore/${q.model}/${q.view}`)
+      u.searchParams.set('qid', q.client_id)
+      u.searchParams.set('toggle', 'vis')
+      exploreUrls.push(u.toString());
     });
   } catch (e) {
     console.error(`Error processing queries from ${queriesPath}:`, e);
