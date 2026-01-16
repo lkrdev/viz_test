@@ -10,6 +10,10 @@ on:
 env:
   BUCKET_NAME: ${{ secrets.CDN_BUCKET_NAME }}
   TYPE: ${{ github.event_name == 'pull_request' && 'draft' || 'prerelease' }}
+  LOOKER_VIZ_PROJECT_NAME: ${{ secrets.LOOKER_VIZ_PROJECT_NAME }}
+  LOOKERSDK_BASE_URL: ${{ secrets.LOOKERSDK_BASE_URL }}
+  LOOKERSDK_CLIENT_ID: ${{ secrets.LOOKERSDK_CLIENT_ID }}
+  LOOKERSDK_CLIENT_SECRET: ${{ secrets.LOOKERSDK_CLIENT_SECRET }}
 
 permissions:
   contents: read
@@ -133,10 +137,10 @@ jobs:
         uses: actions/github-script@v7
         env:
           SNIPPET: ${{ steps.generate-snippet.outputs.snippet }}
-          LOOKER_VIZ_PROJECT_NAME: ${{ secrets.LOOKER_VIZ_PROJECT_NAME }}
-          LOOKERSDK_BASE_URL: ${{ secrets.LOOKERSDK_BASE_URL }}
-          LOOKERSDK_CLIENT_ID: ${{ secrets.LOOKERSDK_CLIENT_ID }}
-          LOOKERSDK_CLIENT_SECRET: ${{ secrets.LOOKERSDK_CLIENT_SECRET }}
+          LOOKER_VIZ_PROJECT_NAME: ${{ env.LOOKER_VIZ_PROJECT_NAME }}
+          LOOKERSDK_BASE_URL: ${{ env.LOOKERSDK_BASE_URL }}
+          LOOKERSDK_CLIENT_ID: ${{ env.LOOKERSDK_CLIENT_ID }}
+          LOOKERSDK_CLIENT_SECRET: ${{ env.LOOKERSDK_CLIENT_SECRET }}
         with:
           script: |
             const commentId = '${{ needs.detect-changes.outputs.comment_id }}';
