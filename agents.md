@@ -80,6 +80,9 @@ Avoid running the entire repository; focus on the specific package.
 
 * Use `yarn test:query-visualization -P <package_name>`
 * **Note:** This script automatically starts the viz dev server (port 8080) and test app (port 4444).
+* **Important:** This command runs TWO visual tests: `query-visualization.test.ts` (generic) and `chatty-visualization.test.ts` (real-world bundle integration).
+* **Verification:** Review BOTH screenshots in `test_app/src/__tests__/<package_name>/__image_snapshots__/`.
+* **Prioritization:** The **chatty** test image is the primary verification of the production bundle. It MUST be prioritized in your `walkthrough.md`.
 * Use `yarn test:query-render -P <package_name>`
 
 ### Static Integrity Checks:
@@ -100,6 +103,8 @@ Avoid running the entire repository; focus on the specific package.
 * [ ] **Styling:** Container is 100% W/H with a transparent background by default.
 * [ ] **Config Protection:** No changes made to Webpack configs or versions.
 * [ ] **Testing:** Targeted tests passed using the `-P` flag.
+* [ ] **Visual Verification:** Both generic and chatty screenshots reviewed.
+* [ ] **Walkthrough:** Both screenshots uploaded to `walkthrough.md`, with the **chatty** image displayed first.
 * [ ] **Packages:** No unnecessary NPM packages added.
 
 ---

@@ -41,6 +41,8 @@ EOF
 cat <<EOF > "$TARGET_DIR/query-visualization.test.ts"
 /**
  * Visual regression test for QueryVisualization component
+ * SNAPSHOTS: test_app/src/__tests__/$PACKAGE_NAME/__image_snapshots__
+ * NOTE: This is the fallback/generic test. The chatty test is prioritized.
  */
 
 import { toMatchImageSnapshot } from "jest-image-snapshot";
@@ -121,6 +123,8 @@ EOF
 cat <<EOF > "$TARGET_DIR/chatty-visualization.test.ts"
 /**
  * Visual regression test for Chatty Visualization component
+ * SNAPSHOTS: test_app/src/__tests__/$PACKAGE_NAME/__image_snapshots__
+ * NOTE: This test is PRIORITIZED for verification.
  */
 
 import { toMatchImageSnapshot } from "jest-image-snapshot";
