@@ -12,7 +12,9 @@
       "allowSyntheticDefaultImports": true
     },
     "exclude": [
-      "node_modules"
+      "node_modules",
+      "src/**/*.test.ts",
+      "src/**/verify_*.ts"
     ],
     "rootDir": [
       "src/"
