@@ -122,8 +122,6 @@ jobs:
       - name: Generate PR Comment Snippet
         id: generate-snippet
         if: success() && github.event_name == 'pull_request'
-        env:
-          LOOKERSDK_BASE_URL: ${{ vars.LOOKERSDK_BASE_URL || 'https://googledemo2.cloud.looker.com' }}
         run: |
           chmod +x ./scripts/generate-viz-comment.ts
           SNIPPET=$(npx -y tsx ./scripts/generate-viz-comment.ts ${{ matrix.package }} ${{ env.TYPE }} ${{ github.event.pull_request.number }})
