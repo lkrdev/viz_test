@@ -133,7 +133,7 @@ expect.extend({ toMatchImageSnapshot });
 
 describe("Chatty Visualization Visual Tests - $PACKAGE_NAME", () => {
   let browser: Browser;
-  const visualizations = ["/test_viz.html"];
+  const visualizations = [process.env.VIZ_URL || "https://localhost:8080/bundle.js"];
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
