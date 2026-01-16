@@ -124,7 +124,7 @@ jobs:
         id: generate-snippet
         if: success() && github.event_name == 'pull_request'
         run: |
-          SNIPPET=$(npx -y tsx ./scripts/generate-viz-comment.ts ${{ matrix.package }} ${{ env.TYPE }} ${{ github.event.pull_request.number }})
+          SNIPPET=$(yarn generate-viz-comment ${{ matrix.package }} ${{ env.TYPE }} ${{ github.event.pull_request.number }})
           echo "snippet<<EOF" >> $GITHUB_OUTPUT
           echo "$SNIPPET" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
