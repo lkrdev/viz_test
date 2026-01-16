@@ -7,6 +7,9 @@ import { getSlugWithVisOverrides } from '../test_app/src/app/api/utils/index';
 import { DevVisualizationType, getVizId, getVizUrl, PATH_MAP } from '../test_app/src/app/api/utils/viz_utils';
 dotenv.config({ path: path.join(process.cwd(), "test_app", ".env") });
 
+const l = (msg: string) => msg.split('\n').forEach(line => console.log(`#out# ${line}`))
+const e = (msg: string) => msg.split('\n').forEach(line => console.error(`#out# ${line}`))
+
 async function run() {
   let package_name = process.argv[2];
 let type = (process.argv[3] || 'draft') as DevVisualizationType;
@@ -16,7 +19,7 @@ const version = process.argv[5];
 const validTypes = Object.keys(PATH_MAP);
 
 if (!package_name) {
-  console.error('Usage: npx tsx generate-viz-comment.ts <package_name> [type] [suffix] [version]');
+  e('Usage: npx tsx generate-viz-comment.ts <package_name> [type] [suffix] [version]');
   process.exit(1);
 }
 
@@ -33,12 +36,12 @@ if (!validTypes.includes(type)) {
 }
 
 if (!process.env.LOOKERSDK_BASE_URL) {
-  console.error('LOOKERSDK_BASE_URL is not set');
+  e('LOOKERSDK_BASE_URL is not set');
   process.exit(1);
 }
 
 if (!process.env.LOOKERSDK_CLIENT_ID || !process.env.LOOKERSDK_CLIENT_SECRET) {
-  console.error('LOOKERSDK_CLIENT_ID or LOOKERSDK_CLIENT_SECRET is not set');
+  e('LOOKERSDK_CLIENT_ID or LOOKERSDK_CLIENT_SECRET is not set');
   process.exit(1);
 }
 const viz_id = getVizId(package_name, type, suffix);
@@ -83,22 +86,22 @@ if (fs.existsSync(queriesPath)) {
       exploreUrls.push(u.toString());
     });
   } catch (e) {
-    console.error(`Error processing queries from ${queriesPath}:`, e);
+    e(`Error processing queries from ${queriesPath}:`, e);
   }
 }
 
-console.log('### 🛠️ Manifest Entry');
-console.log('```lookml');
-console.log(lookml);
-console.log('```');
+  l('### 🛠️ Manifest Entry');
+  l('```lookml');
+  l(lookml);
+  l('```');
 
   if (exploreUrls.length > 0) {
-    console.log('\n### 🔍 Test Explores');
-    exploreUrls.forEach(url => console.log(`- [${url}](${url})`));
+    l('\n### 🔍 Test Explores');
+    exploreUrls.forEach(url => l(`- [${url}](${url})`));
   }
 }
 
 run().catch(err => {
-  console.error(err);
+  e(err);
   process.exit(1);
 });
