@@ -4,6 +4,7 @@ import { LookerCustomVizLayout } from './components/LookerCustomViz';
 import { VizProvider } from "./components/VizContext";
 import './index.css'
 import { Looker, VisualizationDefinition, VisConfig, VisData, VisQueryResponse, VisUpdateDetails } from './types';
+import { VIZ_ID, VIZ_LABEL, VIZ_OPTIONS } from "./viz-constants";
 
 // Declare the global looker object
 declare var looker: Looker;
@@ -11,31 +12,27 @@ declare var looker: Looker;
 // Extend the default interface to include our custom methods
 interface CustomVisualizationDefinition extends VisualizationDefinition {
     addDynamicOptions: (newOptions: any, currentConfig: any) => void;
+  // Helper to clear errors if available on the host
+  clearErrors?: (selector?: string) => void;
 }
 
+// Simple debug logger
+const debugLog = (msg: string, ...args: any[]) => {
+  // Check for a debug flag in URL or similar if needed, currently just protecting console
+  if (true) {
+    console.log(`[${VIZ_ID}] ${msg}`, ...args);
+  }
+}
+
+console.log('VIZ SCRIPT EXECUTING');
+
 const vis: CustomVisualizationDefinition = {
-  id: 'hello_world_tsx',
-  label: 'Hello World (TSX)',
-  options: {
-    title_text: {
-      type: 'string',
-      label: 'Title Text',
-      default: 'Hello Looker!',
-      display: 'text',
-      section: 'Config',
-      order: 1,
-    },
-    background_color: {
-        type: 'string',
-        label: 'Background Color',
-        default: 'transparent',
-        display: 'color',
-        section: 'Style',
-        order: 2,
-    }
-  },
+  id: VIZ_ID,
+  label: VIZ_LABEL,
+  options: VIZ_OPTIONS,
 
   create(element: HTMLElement, config: VisConfig){
+    debugLog('VIZ CREATE CALLED', element, config);
     this.addDynamicOptions = this.addDynamicOptions.bind(this);
     const root = ReactDOM.createRoot(element);
     
@@ -65,10 +62,14 @@ const vis: CustomVisualizationDefinition = {
         }
       };
 
+    debugLog('VIZ CREATE RENDERING ROOT');
     root.render(
+      <div>
+        <h1>Custom Viz Container</h1>
       <VizProvider data={[]} config={config} queryResponse={{data: [], fields: {}, pivots: []}} details={undefined} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig}>
         <LookerCustomVizLayout />
       </VizProvider>
+      </div>
     )
   },
 
@@ -84,6 +85,7 @@ const vis: CustomVisualizationDefinition = {
 
 
   updateAsync(data: VisData, element: HTMLElement, config: VisConfig, queryResponse: VisQueryResponse, details: VisUpdateDetails | undefined, done: () => void) {
+    debugLog('VIZ UPDATEASYNC CALLED', { data, config, queryResponse });
     this.clearErrors?.();
 
     try {
@@ -119,11 +121,17 @@ const vis: CustomVisualizationDefinition = {
     const root = (this as any).root as ReactDOM.Root;
 
     if (root) {
+      debugLog('VIZ UPDATEASYNC RENDERING ROOT');
         root.render(
+          <div>
+            <h1>Custom Viz Container</h1>
         <VizProvider data={data} config={config} queryResponse={queryResponse} details={details} addDynamicOptions={this.addDynamicOptions} updateConfig={updateConfig} onRenderComplete={done}>
             <LookerCustomVizLayout />
         </VizProvider>
+          </div>
         )
+    } else {
+      console.error('VIZ ROOT NOT FOUND IN UPDATEASYNC');
     }
   }
 }

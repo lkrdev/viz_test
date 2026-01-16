@@ -25,7 +25,7 @@ This is a comprehensive starter template for building Looker custom visualizatio
 
 To ensure your custom visualization renders correctly in Looker downloads (PDFs, scheduled emails), you must signal to Looker when your visualization has finished rendering (including any animations).
 
-This template provides an `onRenderComplete` callback via the `useViz` hook.
+This template provides an `onRenderComplete` callback via the `useViz` hook, and relies on the `CustomVisualizationDefinition` interface (extended from Looker's standard types) to manage dynamic options.
 
 ### Usage
 

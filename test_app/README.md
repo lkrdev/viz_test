@@ -1,123 +1,47 @@
-# Hierarchical Combo Filter with Search Example
+# Looker Query Integration Test App
 
-This is an example of embedding Looker and creating a custom hierarchical filter component that interacts with the Looker iframe. The example showcases how to pull data from the Looker API using the Node SDK, modifying the API request to provide advanced search functionality and applying a custom component to the embedded Looker dashboard.
+This application serves as a test harness for embedding and rendering Looker visualizations. It provides a Next.js environment to simulate the embedding context and verify the behavior of custom visualizations.
 
-![Hierarchical Combo Filter with Search Example](/assets/hierarchical-combo-filter-with-search.png)
+## Features
+- **Looker Embedding**: Directly interacts with the Looker API to generate embed URLs.
+- **Visualization Component**: Provides a `QueryVisualization` component to render specific Looker queries.
+- **Dynamic Routing**: Supports testing any query ID via `/query/[query_id]`.
 
-## Demo
+## Prerequisites
 
--   Open the example at [https://lkr.dev/examples/hierarchical-combo-filter-with-search](https://lkr.dev/examples/hierarchical-combo-filter-with-search).
--   Click on the "Apply Hierarchical Filters" button to open the filter popover.
--   Search for a brand, category, or item to filter the dashboard. For example, search for Calvin Klein or Jeans.
--   Click on a brand, category, or item to select it.
--   Click on Done in the bottom right of the popover to apply the filters.
--   The dashboard will be updated to show the filtered data.
+Ensure you have the following environment variables configured in `.env`:
 
-## Embed SDK
-
-**Updating Iframe with Javascript events**
-This example uses Looker's [Javascript Events](https://docs.cloud.google.com/looker/docs/embedded-javascript-events) in order to facilitate an external filter.
-
--   Mapping the hierarchy selection to proper dashboard parameter value
-
-```typescript
-// connection is the SDK representation of a connected iframe with its helper methods.
-const dashboard_connection = connection.asDashboardConnection();
-dashboard_connection.updateFilters({ Hierarchical Filter: 'Brand: Calvin Klein, Category: Jeans' });
-dashboard_connection.run();
+```bash
+NEXT_PUBLIC_LOOKER_HOST_URL=https://your-looker-instance.com
+LOOKERSDK_CLIENT_ID=your_client_id
+LOOKERSDK_CLIENT_SECRET=your_client_secret
+LOOKERSDK_BASE_URL=https://your-looker-instance.com:19999
 ```
 
-## Looker API SDK (Node)
+## Setup
 
-### Custom Filters and Looker Expressions
+1. **Install Dependencies**:
+   ```bash
+   yarn install
+   ```
 
-Looker [filter expressions](https://docs.cloud.google.com/looker/docs/filter-expressions) are a powerful way to filter queries in Looker. They allow the developer to write complex filters using Looker's DSL.
+2. **Run Local Server**:
+   ```bash
+   yarn dev
+   ```
 
-```
-matches_filter(${products.brand}, `%Calvin%`) OR matches_filter(${products.category}, `%Jeans%`) OR ( matches_filter(${products.brand}, `%Calvin%`) AND matches_filter(${products.category}, `%Jeans%`) )
-```
+## Usage
 
-## LookML Examples
+Navigate to the following route to test a specific query:
+`http://localhost:3000/query/[query_id]`
 
--   Comprehensive field searching `case_sensitive: no` [docs](https://docs.cloud.google.com/looker/docs/reference/param-field-case-sensitive)
+For example:
+`http://localhost:3000/query/500`
 
-```lookml
-view: +products {
-    dimension: brand {
-        type: string
-        case_sensitive: no
-        sql: TRIM(${TABLE}.brand) ;;
-    }
-}
-```
+## Components
 
--   Speeding up searches by using [aggregate awareness](https://docs.cloud.google.com/looker/docs/aggregate_awareness)
-
-```lookml
-explore: +order_items {
-  aggregate_table: rollup__products_brand__products_category__products_item_name {
-    query: {
-      dimensions: [products.brand, products.category, products.item_name]
-    }
-    materialization: {
-      datagroup_trigger: ecommerce_etl_modified
-    }
-  }
-}
-```
-
--   Creating a performant hierarchical filter with Looker's [liquid variables](https://docs.cloud.google.com/looker/docs/liquid-variable-reference)
-
-```lookml
-join: brand_category_item {
-    sql:  ;;
-    sql_where:
-    {% assign counter = 0 %}
-    {% assign items = brand_category_item.filter._parameter_value | replace: "$", " " | split: '..' %}
-    {% assign brand = "" | split: "" %}
-    {% assign category = "" | split: "" %}
-    {% assign item_name = "" | split: "" %}
-    {% for item in items %}
-      {% assign f = item | split: '__' %}
-      {% assign item_arr = item | split: ".." %}
-      {% if f.size == 1 %}
-      {% assign brand = brand | concat: item_arr %}
-      {% elsif f.size == 2 %}
-      {% assign category = category | concat: item_arr  %}
-      {% elsif f.size == 3 %}
-      {% assign item_name = item_name | concat: item_arr %}
-      {% endif %}
-    {% endfor %}
-    {% for b in brand %}
-      {% if forloop.first %} ( {% endif %}
-      {% assign counter = counter | plus: 1 %}
-      ( ${products.brand} = '{{ b }}' ) {% if forloop.last %}{% else %} OR {% endif %}
-      {% if forloop.last %} ) {% endif %}
-    {% endfor %}
-    {% for c in category %}
-      {% if forloop.first %} {% if counter > 0 %} OR ( {% else %} ( {% endif %} {% endif %}
-      {% assign counter = counter | plus: 1 %}
-      {% if counter > 0 %}{% else %}{% endif %}
-      {% assign g = c | split: "__" %}
-      ( ${products.brand} = '{{ g[0] }}' AND ${products.category} = '{{ g[1] }}' ) {% if forloop.last %}{% else %} OR {% endif %}
-    {% if forloop.last %} ) {% endif %}
-    {% endfor %}
-    {% for i in item_name %}
-      {% if forloop.first %} {% if counter > 0 %} OR ( {% else %} ( {% endif %} {% endif %}
-      {% assign counter = counter | plus: 1 %}
-      {% assign g = i | split: "__" %}
-      (       ${products.brand} = '{{ g[0] }}'
-          AND ${products.category} = '{{ g[1] }}'
-          AND ${products.item_name} = '{{ g[2] }}'
-      )
-    {% if forloop.last %} ) {% endif %}
-    {% endfor %}
-    {% if counter == 0 %} 1=1 {% endif %}
-  ;;
-}
-
-
-view: brand_category_item {
-  parameter: filter { type: unquoted hidden: no}
-}
-```
+- **QueryVisualization**: Handles the embedding logic using `@looker/embed-sdk`.
+- **API Route (`/api/embed`)**: Server-side proxy for signing and generating embed URLs.
+- **Chatty Viz Harness (`/chatty/[query_id]`)**: A specialized test page for developing custom visualizations locally.
+    - **How it Works**: It mocks the Looker host environment by injecting a "Ghost Iframe" (invisible) or standard iframe that loads the `sandy.js` and `vizsetup.js` scripts, establishing a handshake with your local visualization (served at `viz_url`).
+    - **Usage**: params `viz_url` can be used to point to your local webpack dev server (e.g., `https://localhost:8080/main.js`).

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Viz</title>
+</head>
+<body>
+    <h1>Test Viz - Guest</h1>
+    <div id="status">Waiting for connection...</div>
+    <div id="data-count">Rows: 0</div>
+    <pre id="debug" style="background: #f0f0f0; padding: 10px; border: 1px solid #999; max-height: 200px; overflow: auto;"></pre>
+
+    <script>
+        // Check if Chatty is available (it needs to be bundled or loaded)
+        // Since we don't have a bundler for this static file, we might need a CDN or assume usage of the custom viz builder template.
+        // BUT, for a simple test_viz.html in public, we probably don't have Chatty library access unless we include it.
+        // Actually, the custom viz builder usually bundles it.
+        // For this simple test, we might just listen to postMessage events manually to verify traffic, 
+        // OR we need to make sure this file has access to Chatty client.
+        
+        // Let's implement a minimal "Chatty-like" listener to verify raw postMessage traffic if we can't easily import Chatty here without a build step.
+        // However, the plan said "Chatty.createClient()...". 
+        // We can try to use a CDN/unpkg version of chatty or just raw postMessage to verify the host is sending stuff.
+        
+        window.addEventListener('message', (event) => {
+            console.log('Viz received message:', event.data);
+            const debugEl = document.getElementById('debug');
+            debugEl.textContent += JSON.stringify(event.data) + '\n';
+            
+            if (event.data && event.data.action === 'update') {
+                document.getElementById('status').textContent = 'Connected & Received Update';
+                const rows = event.data.payload.data ? event.data.payload.data.length : 0;
+                document.getElementById('data-count').textContent = 'Rows: ' + rows;
+            }
+        });
+        
+        // To properly simulate Chatty handshake, we might need to recognize the handshake syn/ack.
+        // Chatty Host sends a Syn.
+    </script>
+</body>
+</html>
