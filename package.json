@@ -14,5 +14,9 @@
     "new": "./scripts/new-visualization/new-package.sh $1",
     "check-env": "./scripts/check-env.sh",
     "generate-viz-comment": "npx -p dotenv -p @looker/sdk-node -p @looker/sdk -p lookml-parser -p tsx -y sh -c 'NODE_PATH=$(dirname $(dirname $(which tsx))) tsx ./scripts/generate-viz-comment.ts \"$@\" 2>&1 | sed -n \"s/^#out# //p\"' _"
+  },
+  "devDependencies": {
+    "@types/recharts": "^2.0.1",
+    "recharts": "^3.9.0"
   }
 }
