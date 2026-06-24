@@ -8,10 +8,14 @@ Instead of standard dots, a shape chart might use triangles, circles, plus signs
 ### Examples from Tableau
 1. **Using Custom Shapes as Dashboard Filters:**
    Tableau allows users to import their own custom shapes (like country flags or company logos) and use them in dashboards, sometimes even acting as interactive filters.
-   *(Image source from [Tableau Blog](https://www.tableau.com/nl-nl/blog/using-custom-shapes-dashboard-filters))*
+
+   ![Tableau Custom Shapes Example](https://interworks.com/wp-content/uploads/sites/default/files/blog-content/TEFTCustomShapes8.png)
+   *(Image source from [Tableau Blog / Interworks](https://www.tableau.com/nl-nl/blog/using-custom-shapes-dashboard-filters))*
 
 2. **Standard Shape Palettes:**
    Tableau provides built-in shape palettes (e.g., filled shapes, hollow shapes, arrows, weather symbols) to quickly assign to dimension members.
+
+   ![Tableau Shape Palette Configuration](https://interworks.com/wp-content/uploads/sites/default/files/blog-content/TEFTCustomShapes3.png)
 
 ## Implementation in Looker (via Custom Visualizations)
 Looker does not have a native "Shape Chart" out of the box in its standard visualization library that behaves exactly like Tableau's (where you can dynamically map a dimension to a shape palette).
